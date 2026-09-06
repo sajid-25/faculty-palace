@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { extractTextFromBuffer, isSupportedFileType } from "@/lib/services/textExtraction.service";
-import { saveUploadedDocument } from "@/lib/services/uploadStorage.service";
+import { persistAssessmentUpload } from "@/lib/services/assessmentPersistence.service";
 import { getCurrentUser } from "@/lib/supabase/auth";
 
 export async function POST(request: NextRequest) {
   try {
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ success: false, error: "Sign in before uploading an exam." }, { status: 401 });
+    if (user.role === "reviewer") return NextResponse.json({ success: false, error: "External Examiners have read-only access." }, { status: 403 });
+
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
     const examTitle = (formData.get("examTitle") as string) || undefined;
@@ -33,14 +37,16 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(arrayBuffer);
 
     const extracted = await extractTextFromBuffer(buffer, file.name, file.type);
-    const user = await getCurrentUser().catch(() => null);
 
-    const record = await saveUploadedDocument({
+    const record = await persistAssessmentUpload({
       type: "exam",
-      extracted,
-      buffer,
-      userId: user?.id,
-      userEmail: user?.email,
+      userId: user.id,
+      userEmail: user.email,
+      filename: extracted.filename,
+      rawText: extracted.rawText,
+      textLength: extracted.characterCount,
+      wordCount: extracted.wordCount,
+      pageCount: extracted.pageCount,
       courseCode,
       examTitle,
       totalMarks: Number.isNaN(totalMarks) ? undefined : totalMarks,

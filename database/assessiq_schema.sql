@@ -46,6 +46,19 @@ create table if not exists public.exam_papers (
   updated_at timestamptz not null default now()
 );
 
+create table if not exists public.uploaded_documents (
+  id uuid primary key default gen_random_uuid(),
+  uploaded_by uuid not null references public.profiles(id) on delete cascade,
+  course_id uuid not null references public.courses(id) on delete cascade,
+  document_type text not null check (document_type in ('syllabus', 'course_outcomes')),
+  filename text not null,
+  raw_text text not null,
+  text_length integer not null default 0,
+  word_count integer not null default 0,
+  page_count integer,
+  created_at timestamptz not null default now()
+);
+
 create table if not exists public.questions (
   id uuid primary key default gen_random_uuid(),
   exam_paper_id uuid references public.exam_papers(id) on delete cascade,
@@ -110,6 +123,7 @@ alter table public.courses enable row level security;
 alter table public.course_outcomes enable row level security;
 alter table public.syllabus_topics enable row level security;
 alter table public.exam_papers enable row level security;
+alter table public.uploaded_documents enable row level security;
 alter table public.questions enable row level security;
 alter table public.question_analysis enable row level security;
 alter table public.similarity_matches enable row level security;
@@ -134,6 +148,16 @@ create policy "Users can view permitted exam papers" on public.exam_papers
 
 drop policy if exists "Faculty and admins can create exam papers" on public.exam_papers;
 create policy "Faculty and admins can create exam papers" on public.exam_papers
+  for insert to authenticated
+  with check (uploaded_by = auth.uid() and public.current_user_role() in ('faculty', 'admin'));
+
+drop policy if exists "Users can view permitted documents" on public.uploaded_documents;
+create policy "Users can view permitted documents" on public.uploaded_documents
+  for select to authenticated
+  using (uploaded_by = auth.uid() or public.current_user_role() in ('admin', 'reviewer'));
+
+drop policy if exists "Faculty and admins can create documents" on public.uploaded_documents;
+create policy "Faculty and admins can create documents" on public.uploaded_documents
   for insert to authenticated
   with check (uploaded_by = auth.uid() and public.current_user_role() in ('faculty', 'admin'));
 
@@ -165,6 +189,7 @@ create index if not exists course_outcomes_course_idx on public.course_outcomes(
 create index if not exists syllabus_topics_course_idx on public.syllabus_topics(course_id);
 create index if not exists exam_papers_course_idx on public.exam_papers(course_id);
 create index if not exists exam_papers_uploaded_by_idx on public.exam_papers(uploaded_by);
+create index if not exists uploaded_documents_uploaded_by_idx on public.uploaded_documents(uploaded_by);
 create index if not exists questions_exam_paper_idx on public.questions(exam_paper_id);
 create index if not exists questions_source_idx on public.questions(source, exam_year);
 create index if not exists question_analysis_bloom_idx on public.question_analysis(bloom_level);
