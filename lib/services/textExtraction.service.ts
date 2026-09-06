@@ -48,11 +48,10 @@ export async function extractTextFromBuffer(
   if (ext === ".pdf" || mimeType === "application/pdf") {
     try {
       const parser = new PDFParse({ data: buffer });
-      await parser.load();
       const textResult = await parser.getText();
       rawText = typeof textResult === "string" ? textResult : (textResult as { text?: string })?.text || "";
-      const info = await parser.getInfo?.().catch(() => null);
-      pageCount = info?.pages || undefined;
+      const info = await parser.getInfo().catch(() => null);
+      pageCount = info?.total || undefined;
       await parser.destroy?.().catch(() => null);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Unknown error parsing PDF";
