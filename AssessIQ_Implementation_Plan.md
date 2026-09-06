@@ -1,8 +1,8 @@
-# AssessIQ — Implementation Plan
+# Faculty Palace — Implementation Plan
 
 ## 1. Project Goal
 
-Build **AssessIQ**, an AI-powered academic assessment auditing tool.
+Build **Faculty Palace**, an AI-powered academic assessment auditing tool.
 
 ### Core Journey
 
@@ -125,7 +125,7 @@ Used for:
 # 4. Project Structure
 
 ```text
-assessiq/
+faculty-palace/
 │
 ├── frontend/
 │   ├── src/
@@ -607,7 +607,7 @@ Backend API
 3. Create reusable AI service.
 4. Make model configurable.
 5. Test currently available models.
-6. Choose the best model using real AssessIQ tasks.
+6. Choose the best model using real Faculty Palace tasks.
 
 Test:
 
@@ -688,7 +688,7 @@ GROQ_MODEL=selected_model
 During development:
 
 1. List/check currently available Groq models.
-2. Test multiple models using the same AssessIQ prompts.
+2. Test multiple models using the same Faculty Palace prompts.
 3. Compare:
    - Accuracy
    - JSON consistency
@@ -936,7 +936,7 @@ Dashboard shows findings
 Faculty receives useful recommendations
 ```
 
-If this works smoothly, AssessIQ is already a complete, convincing MVP.
+If this works smoothly, Faculty Palace is already a complete, convincing MVP.
 
 ---
 

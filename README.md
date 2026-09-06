@@ -1,4 +1,4 @@
-AssessIQ is a Next.js assessment auditing workspace with Supabase-backed role authentication.
+Faculty Palace is a Next.js assessment auditing workspace with Supabase-backed role authentication.
 
 ## Run locally
 
@@ -19,7 +19,7 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser.
 
-Supabase Auth stores credentials and sessions. The `profiles` table stores the AssessIQ role. New public registrations create Course Instructor accounts; Department Head and External Examiner roles should be assigned by an administrator in Supabase.
+Supabase Auth stores credentials and sessions. The `profiles` table stores the Faculty Palace role. New public registrations create Course Instructor accounts; Department Head and External Examiner roles should be assigned by an administrator in Supabase.
 
 To create the optional demo accounts, open Supabase Dashboard > Authentication > Users and create these users with password `AssessIQDemo123!`:
 

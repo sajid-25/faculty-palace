@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AssessIQ | Assessment intelligence",
+  title: "Faculty Palace | Assessment intelligence",
   description: "Turn draft assessments into clear, confident decisions.",
 };
 
