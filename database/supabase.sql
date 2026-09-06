@@ -1,5 +1,5 @@
 -- Run this file in Supabase Dashboard > SQL Editor.
--- Supabase Auth stores credentials in auth.users. This table stores AssessIQ roles.
+-- Supabase Auth stores credentials in auth.users. This table stores Faculty Palace roles.
 
 create table if not exists public.profiles (
   id uuid primary key references auth.users(id) on delete cascade,

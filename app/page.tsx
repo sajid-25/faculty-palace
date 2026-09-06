@@ -133,8 +133,8 @@ function LandingPage() {
     <main className="landing-page">
       <header className="landing-header">
         <Link className="brand landing-brand" href="/">
-          <span className="brand-mark">A</span>
-          <span>assess<span>iq</span></span>
+          <span className="brand-mark">FP</span>
+          <span>faculty<span>palace</span></span>
         </Link>
         <nav className="landing-nav" aria-label="Landing page navigation">
           <a href="#how-it-works">How it works</a>
@@ -148,7 +148,7 @@ function LandingPage() {
         <div className="landing-hero-copy">
           <p className="eyebrow">ACADEMIC ASSESSMENT INTELLIGENCE</p>
           <h1>Better exams begin<br />with <em>better questions.</em></h1>
-          <p className="landing-description">AssessIQ helps academic teams audit draft assessments, align questions to course outcomes, and build exams students can learn from.</p>
+          <p className="landing-description">Faculty Palace helps academic teams audit draft assessments, align questions to course outcomes, and build exams students can learn from.</p>
           <div className="landing-actions"><Link className="landing-primary" href="/register">Create your workspace <span>→</span></Link><Link className="landing-secondary" href="/login">Already have an account? Sign in</Link></div>
           <div className="landing-trust"><span className="trust-line" /><span>Built for thoughtful assessment teams</span></div>
         </div>
@@ -162,7 +162,7 @@ function LandingPage() {
       <section className="landing-features" id="how-it-works"><div className="landing-section-heading"><p className="eyebrow">ONE CLEAR WORKFLOW</p><h2>From draft paper to confident decision.</h2></div><div className="feature-grid"><article><span className="feature-number">01</span><h3>Upload your materials</h3><p>Bring together your syllabus, course outcomes, and draft exam in one focused workspace.</p></article><article><span className="feature-number">02</span><h3>See what the questions reveal</h3><p>Map topics, outcomes, Bloom&apos;s levels, coverage gaps, and repeated questions at a glance.</p></article><article><span className="feature-number">03</span><h3>Improve with purpose</h3><p>Give every finding a reason and an actionable next step before the paper reaches students.</p></article></div></section>
 
       <section className="landing-roles" id="roles"><div><p className="eyebrow">DESIGNED FOR THE WHOLE TEAM</p><h2>One standard.<br /><em>Three perspectives.</em></h2></div><p>Role-based workspaces give instructors, department heads, and external examiners the right level of visibility and control.</p><Link className="landing-secondary" href="/register">Choose your role <span>→</span></Link></section>
-      <footer className="landing-footer"><span>© 2026 AssessIQ</span><span>Assessment quality assurance, made clearer.</span><Link href="/login">Sign in to workspace ↗</Link></footer>
+      <footer className="landing-footer"><span>© 2026 Faculty Palace</span><span>Assessment quality assurance, made clearer.</span><Link href="/login">Sign in to workspace ↗</Link></footer>
     </main>
   );
 }
@@ -389,7 +389,7 @@ export default function Home() {
     : navItems;
 
   if (isLoading) {
-    return <div className="route-loading">Loading your AssessIQ workspace...</div>;
+    return <div className="route-loading">Loading your Faculty Palace workspace...</div>;
   }
 
   if (pathname === "/" && !isLoggedIn) {
@@ -406,8 +406,8 @@ export default function Home() {
       {/* Sidebar */}
       <aside className="sidebar">
         <div className="brand">
-          <span className="brand-mark">A</span>
-          <span>assess<span>iq</span></span>
+          <span className="brand-mark">FP</span>
+          <span>faculty<span>palace</span></span>
         </div>
 
         <div className="workspace-switcher">
@@ -442,7 +442,7 @@ export default function Home() {
           <div className="help-card">
             <span className="help-icon">?</span>
             <div>
-              <strong>AssessIQ Guide</strong>
+              <strong>Faculty Palace Guide</strong>
               <small>Role-based Permissions</small>
             </div>
             <span>↗</span>
@@ -544,7 +544,7 @@ export default function Home() {
                 <div className="gate-tag">ROLE-BASED ACADEMIC AUDITING</div>
                 <h2>Sign in to access your assessment workspace</h2>
                 <p className="gate-description">
-                  AssessIQ enforces role-based access control (RBAC). Course Instructors upload draft exams and run AI audits,
+                  Faculty Palace enforces role-based access control (RBAC). Course Instructors upload draft exams and run AI audits,
                   Department Heads approve papers for printing, and External Examiners conduct independent moderation.
                 </p>
 
