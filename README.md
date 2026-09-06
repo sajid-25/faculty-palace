@@ -1,8 +1,11 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+AssessIQ is a Next.js assessment auditing workspace with Supabase-backed role authentication.
 
-## Getting Started
+## Run locally
 
-First, run the development server:
+1. Create a Supabase project at [supabase.com](https://supabase.com).
+2. Copy `.env.example` to `.env.local` and add the project URL and anon key.
+3. Run `database/supabase.sql` in Supabase Dashboard > SQL Editor.
+4. Start the development server:
 
 ```bash
 npm run dev
@@ -14,7 +17,25 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser.
+
+Supabase Auth stores credentials and sessions. The `profiles` table stores the AssessIQ role. New public registrations create Course Instructor accounts; Department Head and External Examiner roles should be assigned by an administrator in Supabase.
+
+To create the optional demo accounts, open Supabase Dashboard > Authentication > Users and create these users with password `AssessIQDemo123!`:
+
+| Role | Email |
+| --- | --- |
+| Department Head | `sarah.rahman@institution.edu` |
+| Course Instructor | `arjun.mehta@institution.edu` |
+| External Examiner | `david.chen@external-board.edu` |
+
+After creating them, run this in the Supabase SQL Editor to assign their roles:
+
+```sql
+update public.profiles set role = 'admin' where id = (select id from auth.users where email = 'sarah.rahman@institution.edu');
+update public.profiles set role = 'faculty' where id = (select id from auth.users where email = 'arjun.mehta@institution.edu');
+update public.profiles set role = 'reviewer' where id = (select id from auth.users where email = 'david.chen@external-board.edu');
+```
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

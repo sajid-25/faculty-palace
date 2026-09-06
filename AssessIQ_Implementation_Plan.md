@@ -724,18 +724,130 @@ Use local Sentence Transformers so similarity detection does not depend on an ex
 
 ## Demo Data
 
-Prepare before the event:
+Prepare before the event. See **Section 16.1 — Seed Data Strategy** for the full scope, content structure, and loading approach.
 
-- 1–2 syllabus documents
-- Course Outcomes
-- Draft exam papers
-- Historical question papers
+---
 
-Seed enough historical questions to demonstrate:
+## 16.1 Seed Data Strategy
 
-- Exact repetition
-- Paraphrased repetition
-- Non-repeated questions
+### Scope
+
+Do not seed multiple courses. Pick **one real course** the team knows well (e.g., *Data Structures*, *Database Management Systems*). One convincing, fully-populated example beats three shallow ones on demo day.
+
+Build exactly:
+
+- **1 syllabus** — 6–10 topics
+- **4–6 Course Outcomes (COs)**
+- **1 current draft exam** — 10–15 questions (this is what faculty "uploads" live in the demo)
+- **2–3 historical exams** — 30–50 questions total (this becomes the seeded question bank)
+
+This is enough to demonstrate every MVP feature without spending hours writing content.
+
+### Engineer the seed data on purpose
+
+The historical question bank should not just be "realistic" — it should be **constructed** so every MVP feature has something to find:
+
+| Include | Count | Purpose |
+|---|---|---|
+| Exact duplicate questions across years | 2–3 pairs | Similarity detector: exact match |
+| Paraphrased duplicate questions | 2–3 pairs | Similarity detector: semantic match |
+| Unique questions spread across topics | ~20 | Baseline coverage |
+| Syllabus topics with **zero** historical/current coverage | 1–2 | Coverage gap detection |
+| Imbalanced Bloom's levels (e.g., mostly "Remember"/"Understand", little "Analyze"/"Create") | — | Bloom's imbalance detection |
+| Imbalanced marks distribution vs syllabus weightage | — | Marks-weightage comparison (should-have feature) |
+
+Then write the **new draft exam** (the one uploaded live) to intentionally include:
+- One question that is an **exact copy** of a historical question
+- One question that is a **paraphrase** of a historical question
+- One or two questions targeting the **uncovered topic**
+- A skewed Bloom's distribution
+
+This way, every judged feature fires visibly during the live run instead of relying on luck with real content.
+
+### File formats
+
+Store raw seed content as plain JSON files in `database/seed/`:
+
+```text
+database/seed/
+├── syllabus.json
+├── course_outcomes.json
+├── historical_questions.json
+└── draft_exam.json
+```
+
+**`syllabus.json`**
+```json
+[
+  { "topic": "Arrays and Linked Lists", "description": "Static/dynamic arrays, singly/doubly linked lists" },
+  { "topic": "Stacks and Queues", "description": "LIFO/FIFO structures, applications" },
+  { "topic": "Trees", "description": "Binary trees, traversals, expression trees" },
+  { "topic": "Binary Search Trees", "description": "BST operations, balancing, AVL/Red-Black basics" },
+  { "topic": "Heaps and Priority Queues", "description": "Heap operations, heap sort" },
+  { "topic": "Graphs", "description": "Representations, BFS, DFS, shortest path" },
+  { "topic": "Sorting Algorithms", "description": "Comparison and non-comparison based sorting" },
+  { "topic": "Hashing", "description": "Hash functions, collision handling" }
+]
+```
+
+**`course_outcomes.json`**
+```json
+[
+  { "code": "CO1", "description": "Understand fundamental data structure concepts" },
+  { "code": "CO2", "description": "Apply appropriate data structures to solve computational problems" },
+  { "code": "CO3", "description": "Analyze the time and space complexity of algorithms" },
+  { "code": "CO4", "description": "Design and implement efficient solutions using trees and graphs" }
+]
+```
+
+**`historical_questions.json`** — each entry already carries its ground-truth labels, so it does **not** need to go through Groq at seed time:
+```json
+[
+  {
+    "exam_year": 2023,
+    "question": "Explain the difference between a stack and a queue with examples.",
+    "topic": "Stacks and Queues",
+    "course_outcome": "CO1",
+    "bloom_level": "Understand",
+    "marks": 5
+  },
+  {
+    "exam_year": 2024,
+    "question": "Differentiate between stack and queue data structures, giving one real-world example of each.",
+    "topic": "Stacks and Queues",
+    "course_outcome": "CO1",
+    "bloom_level": "Understand",
+    "marks": 5
+  }
+]
+```
+(The two entries above are the deliberate paraphrase pair — same idea, reworded.)
+
+**`draft_exam.json`** — the "live upload" file, written in plain exam-paper text (not pre-labeled), since this is what actually gets parsed by Groq during the demo:
+```json
+{
+  "title": "Data Structures — Midterm Draft 2026",
+  "raw_text": "1. Explain the difference between a stack and a queue with examples. (5 marks)\n2. ..."
+}
+```
+
+### Loading it into the stack
+
+1. **One seed script**, not manual SQL: `database/seed/seed.js`, run via `docker compose exec backend node seed.js` or automatically on backend container startup.
+2. The script:
+   - Inserts Course → Syllabus topics → COs into PostgreSQL.
+   - Inserts each historical question into `Questions` with `source: "historical"`, using the labels already present in the JSON (skip Groq entirely for these — they're ground truth, not something to classify).
+   - For each historical question, calls the embedding service (`POST /embed`) to get a vector, then inserts it into `QuestionEmbeddings` via pgvector.
+   - Leaves `draft_exam.json` untouched — it gets uploaded through the normal `/upload/exam` flow during the demo so Groq parsing, topic/CO mapping, Bloom classification, and similarity search all run live.
+3. **Bake seeding into Docker Compose startup** (rather than a manual one-off script you have to remember to run) so the environment is deterministic every time it's brought up — one less thing that can go wrong walking on stage.
+
+### Pre-demo verification (do this before you're in front of judges)
+
+- Manually run a similarity query on the known exact-duplicate pair — confirm score is very high (>0.95).
+- Run it on the known paraphrase pair — confirm it lands in a clearly "similar but not identical" range (roughly 0.75–0.90) and doesn't get missed or double-counted.
+- Calibrate the similarity threshold used for flagging based on these two numbers, not guesswork.
+- Confirm the coverage report actually shows the intentionally-uncovered topic as missing.
+- Do a full dry run of the live upload → report flow at least once end-to-end before presenting.
 
 ---
 
