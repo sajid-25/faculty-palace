@@ -60,12 +60,14 @@ In universities and higher education institutions, creating examination papers i
 
 **Faculty Palace** transforms exam vetting into an automated, data-driven, and collaborative intelligence workflow.
 
-```
-┌─────────────────┐       ┌─────────────────┐       ┌──────────────────┐       ┌───────────────────┐
-│  Faculty Upload │       │  Groq AI Parser │       │ Semantic Audit   │       │ Actionable Report │
-│  Syllabus +     │ ────▶ │  Extracts Qs &  │ ────▶ │ Topic, CO, Bloom │ ────▶ │ Quality Score,    │
-│  Draft Exam     │       │  Marks via LLM  │       │ & Duplicate Scan │       │ Gaps & Approval   │
-└─────────────────┘       └─────────────────┘       └──────────────────┘       └───────────────────┘
+```mermaid
+flowchart LR
+    A["Faculty Upload<br/>Syllabus +<br/>Draft Exam"]
+    B["Groq AI Parser<br/>Extracts Qs &<br/>Marks via LLM"]
+    C["Semantic Audit<br/>Topic, CO, Bloom<br/>& Duplicate Scan"]
+    D["Actionable Report<br/>Quality Score,<br/>Gaps & Approval"]
+
+    A --> B --> C --> D
 ```
 
 Within seconds, the platform:
