@@ -12,10 +12,11 @@ Faculty Palace helps academic teams audit draft assessments, align questions to 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Groq AI](https://img.shields.io/badge/AI_Inference-Groq_LPU-f55036?style=for-the-badge&logo=fastapi&logoColor=white)](https://groq.com/)
 [![Supabase](https://img.shields.io/badge/Database-Supabase_PostgreSQL-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.com/)
+[![Vercel Deployment](https://img.shields.io/badge/Deployment-Vercel-black?style=for-the-badge&logo=vercel&logoColor=white)](https://faculty-palace.vercel.app)
 [![Tailwind CSS](https://img.shields.io/badge/Styling-Tailwind_CSS_v4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
-[Explore Overview](#-key-features) • [System Architecture](#-system-architecture) • [Role Matrix](#-role-based-access-control-rbac) • [Scoring Algorithm](#-quality-scoring-engine) • [Quickstart](#-getting-started) • [API Reference](#-api-routes)
+[🌐 Live Demo](https://faculty-palace.vercel.app) • [Explore Overview](#-key-features) • [System Architecture](#-system-architecture) • [Role Matrix](#-role-based-access-control-rbac) • [Scoring Algorithm](#-quality-scoring-engine) • [Quickstart](#-getting-started) • [API Reference](#-api-routes) • [Team](#-team--contributors)
 
 ---
 
@@ -40,6 +41,7 @@ Faculty Palace helps academic teams audit draft assessments, align questions to 
   - [Demo Accounts](#demo-accounts)
 - [API Routes](#-api-routes)
 - [Roadmap](#-roadmap)
+- [Team & Contributors](#-team--contributors)
 - [Contributing](#-contributing)
 - [License](#-license)
 
@@ -410,6 +412,18 @@ update public.profiles set role = 'reviewer' where id = (select id from auth.use
 - [ ] **Phase 6: Official PDF/LaTeX Export** — One-click generation of formatted, print-ready university exam papers.
 - [ ] **Phase 7: LMS Integration** — Two-way synchronization with Canvas, Blackboard, and Moodle.
 - [ ] **Phase 8: Multi-Section Federated Analytics** — Historical trends and cognitive consistency across multiple instructors teaching the same course.
+
+---
+
+## 👥 Team & Contributors
+
+Faculty Palace was created and built by an engineering trio during the 6.5-hour long **AUST CSE Carnival 8.0 | AI Build Hackathon**. Key responsibilities and contributions:
+
+| Contributor | Focus Areas | Key Deliverables & Contributions |
+| :--- | :--- | :--- |
+| **Sajid Al Amin**<br>([@sajid-25](https://github.com/sajid-25)) | **Dashboard, Auth & Intelligence Reporting** | • Interactive Next.js Dashboard & Assessment Workspace UI<br>• Supabase Authentication integration (Client & Server routes)<br>• Initial database schema & historical question seed datasets<br>• Question similarity computation & assessment report generation<br>• Initial project foundation & scaffolding |
+| **Auniruddho Halder**<br>([@auniruddhohalder](https://github.com/auniruddhohalder)) | **AI Engine & Ingestion Pipeline** | • Reusable Groq LPU AI service layer & client integration<br>• PDF document ingestion & text extraction engine<br>• Question parsing service & structured prompt templates<br>• Assessment file upload API endpoints & storage services<br>• AI telemetry logging & automated retry fallbacks |
+| **Fuad**<br>([@fuad023](https://github.com/fuad023)) | **Database, Vercel Deployment & UX / Theming** | • **Production Deployment on Vercel:** [faculty-palace.vercel.app](https://faculty-palace.vercel.app)<br>• Supabase backend configuration & database administration<br>• Tri-mode Theme Switcher system (Light/Dark/System default)<br>• Custom CSS tokens, fluid animations & responsive styling<br>• Project rebranding (AssessIQ → Faculty Palace)<br>• Comprehensive showcase documentation & Mermaid architecture diagrams |
 
 ---
 
