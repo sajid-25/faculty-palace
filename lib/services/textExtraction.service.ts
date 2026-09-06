@@ -63,6 +63,7 @@ export async function extractTextFromBuffer(
     rawText = buffer.toString("utf-8");
   }
 
+  // Clean and normalize whitespace while preserving structural line breaks
   const cleanedText = rawText
     .replace(/\r\n/g, "\n")
     .replace(/\r/g, "\n")

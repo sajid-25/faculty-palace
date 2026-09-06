@@ -21,6 +21,7 @@ export interface StoredUploadRecord {
   pageCount?: number;
 }
 
+// In-memory registry for quick access across API calls
 const uploadStore = new Map<string, StoredUploadRecord>();
 
 const UPLOAD_ROOT = path.join(process.cwd(), "uploads");
@@ -48,6 +49,7 @@ export async function saveUploadedDocument(params: {
   const safeFilename = `${id}-${path.basename(params.extracted.filename)}`;
   const diskPath = path.join(UPLOAD_ROOT, subDir, safeFilename);
 
+  // Write file buffer to disk
   await fs.writeFile(diskPath, params.buffer);
 
   const record: StoredUploadRecord = {
