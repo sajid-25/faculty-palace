@@ -1,4 +1,4 @@
--- AssessIQ assessment database schema.
+-- Faculty Palace assessment database schema.
 -- Run database/supabase.sql first for profiles and Supabase Auth.
 
 create table if not exists public.courses (

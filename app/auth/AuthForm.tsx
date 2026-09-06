@@ -85,8 +85,8 @@ export default function AuthForm({ mode }: AuthFormProps) {
       <div className="auth-atmosphere auth-atmosphere-right" />
       <header className="auth-header">
         <Link className="brand auth-brand" href="/">
-          <span className="brand-mark">A</span>
-          <span>assess<span>iq</span></span>
+          <span className="brand-mark">FP</span>
+          <span>faculty<span>palace</span></span>
         </Link>
         <span className="auth-header-note">Role-Based Assessment Intelligence</span>
       </header>
@@ -96,7 +96,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
           <p className="eyebrow">ACADEMIC ROLE-BASED WORKSPACE</p>
           <h1>Make every question<br /><em>count.</em></h1>
           <p className="auth-story-copy">
-            AssessIQ tailors permissions and workflows specifically for Course Instructors, Department Heads, and External Examiners.
+            Faculty Palace tailors permissions and workflows specifically for Course Instructors, Department Heads, and External Examiners.
           </p>
 
           <div className="auth-role-summary-list">
@@ -159,7 +159,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
             <>
               <div className="auth-card-heading">
                 <span className="auth-kicker">{isRegistering ? "GET STARTED" : "WELCOME BACK"}</span>
-                <h2>{isRegistering ? "Create your faculty account" : "Sign in to AssessIQ"}</h2>
+                <h2>{isRegistering ? "Create your faculty account" : "Sign in to Faculty Palace"}</h2>
                 <p>
                   {isRegistering
                     ? "Select your academic role to unlock tailored assessment permissions."
@@ -331,7 +331,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
         </div>
       </section>
       <footer className="auth-footer">
-        <span>© 2026 AssessIQ</span>
+        <span>© 2026 Faculty Palace</span>
         <span>Role-Based Academic Assessment Quality Assurance</span>
       </footer>
     </main>
