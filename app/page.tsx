@@ -4,6 +4,7 @@ import { ChangeEvent, useState, useMemo } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth, DEMO_USERS } from "./context/AuthContext";
+import ThemeSwitcher from "./components/ThemeSwitcher";
 
 type Question = {
   number: string;
@@ -140,6 +141,7 @@ function LandingPage() {
           <a href="#roles">For faculty</a>
           <Link href="/login">Sign in</Link>
           <Link className="landing-cta" href="/register">Get started <span>→</span></Link>
+          <ThemeSwitcher variant="dropdown" />
         </nav>
       </header>
 
@@ -361,6 +363,11 @@ export default function Home() {
         </nav>
 
         <div className="sidebar-bottom">
+          <div className="sidebar-theme-row">
+            <span className="theme-sidebar-label">APPEARANCE</span>
+            <ThemeSwitcher variant="segmented" />
+          </div>
+
           <div className="help-card">
             <span className="help-icon">?</span>
             <div>
@@ -414,6 +421,7 @@ export default function Home() {
           </div>
 
           <div className="top-actions">
+            <ThemeSwitcher variant="dropdown" />
             {isLoggedIn ? (
               <>
                 <div className="user-top-pill">

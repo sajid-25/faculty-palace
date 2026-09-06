@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { useAuth, UserRole, DEMO_USERS, isValidEmail } from "../context/AuthContext";
+import ThemeSwitcher from "../components/ThemeSwitcher";
 
 type AuthFormProps = {
   mode: "login" | "register";
@@ -88,7 +89,10 @@ export default function AuthForm({ mode }: AuthFormProps) {
           <span className="brand-mark">FP</span>
           <span>faculty<span>palace</span></span>
         </Link>
-        <span className="auth-header-note">Role-Based Assessment Intelligence</span>
+        <div className="auth-header-right">
+          <span className="auth-header-note">Role-Based Assessment Intelligence</span>
+          <ThemeSwitcher variant="dropdown" />
+        </div>
       </header>
 
       <section className="auth-layout">
