@@ -1,28 +1,25 @@
-import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
-import { createSession, attachSessionCookie } from "../../../../lib/auth";
-import { db } from "../../../../lib/db";
+import { createSupabaseServerClient } from "../../../../lib/supabase/server";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const email = String(body.email || "").trim().toLowerCase();
     const password = String(body.password || "");
-    const result = await db.query("SELECT id, name, email, role, password_hash FROM users WHERE email = $1", [email]);
-    const account = result.rows[0];
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error || !data.user) return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
 
-    if (!account || !(await bcrypt.compare(password, account.password_hash))) {
-      return NextResponse.json({ error: "Invalid email or password." }, { status: 401 });
-    }
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("id, name, role")
+      .eq("id", data.user.id)
+      .single();
+    if (profileError || !profile) return NextResponse.json({ error: "Your account profile is not configured." }, { status: 500 });
 
-    const session = await createSession(account.id);
-    const response = NextResponse.json({
-      user: { id: account.id, name: account.name, email: account.email, role: account.role },
-    });
-    attachSessionCookie(response, session.token, session.expiresAt);
-    return response;
+    return NextResponse.json({ user: { ...profile, email: data.user.email } });
   } catch (error) {
     console.error("Login failed", error);
-    return NextResponse.json({ error: "Unable to sign in." }, { status: 500 });
+    return NextResponse.json({ error: "Unable to connect to Supabase. Check your environment variables." }, { status: 503 });
   }
 }

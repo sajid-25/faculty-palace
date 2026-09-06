@@ -296,10 +296,14 @@ export default function AuthForm({ mode }: AuthFormProps) {
 
                     {formError && <span className="field-error-msg" role="alert">⚠ {formError}</span>}
                     <button className="auth-submit" type="submit" disabled={isSubmitting}>
-                      {isRegistering
-                        ? "Create Course Instructor Account"
-                        : "Sign in to Workspace"}
-                      <span>→</span>
+                      {isSubmitting ? (
+                        <span className="button-loading"><i className="loading-spinner" /> {isRegistering ? "Creating account..." : "Signing in..."}</span>
+                      ) : (
+                        <>
+                          <span>{isRegistering ? "Create Course Instructor Account" : "Sign in to Workspace"}</span>
+                          <span>→</span>
+                        </>
+                      )}
                     </button>
                   </form>
                 </>

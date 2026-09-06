@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
-import { clearSessionCookie, deleteCurrentSession } from "../../../../lib/auth";
+import { createSupabaseServerClient } from "../../../../lib/supabase/server";
 
 export async function POST() {
   try {
-    await deleteCurrentSession();
-    const response = NextResponse.json({ ok: true });
-    clearSessionCookie(response);
-    return response;
+    const supabase = await createSupabaseServerClient();
+    await supabase.auth.signOut();
+    return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("Logout failed", error);
     return NextResponse.json({ error: "Unable to sign out." }, { status: 500 });

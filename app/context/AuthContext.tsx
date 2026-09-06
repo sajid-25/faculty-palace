@@ -146,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || "Unable to create the account.");
+    if (!data.user) throw new Error("Account created. Confirm your email in Supabase, then sign in.");
     applyUser(data.user);
   };
 
