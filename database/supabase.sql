@@ -42,3 +42,42 @@ insert into public.profiles (id, name, role)
 select id, coalesce(raw_user_meta_data->>'full_name', split_part(email, '@', 1)), 'faculty'
 from auth.users
 on conflict (id) do nothing;
+
+-- -------------------------------------------------------------
+-- Core Academic Assessment Tables
+-- -------------------------------------------------------------
+
+create table if not exists public.courses (
+  id uuid primary key default gen_random_uuid(),
+  code text not null,
+  title text not null,
+  instructor_id uuid references public.profiles(id) on delete set null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.syllabi (
+  id uuid primary key default gen_random_uuid(),
+  course_id uuid references public.courses(id) on delete cascade,
+  uploader_id uuid references public.profiles(id) on delete set null,
+  filename text not null,
+  file_path text,
+  extracted_text text not null,
+  text_length int not null default 0,
+  word_count int not null default 0,
+  uploaded_at timestamptz not null default now()
+);
+
+create table if not exists public.exam_papers (
+  id uuid primary key default gen_random_uuid(),
+  course_id uuid references public.courses(id) on delete set null,
+  uploader_id uuid references public.profiles(id) on delete set null,
+  title text not null,
+  filename text not null,
+  file_path text,
+  total_marks int,
+  extracted_text text not null,
+  text_length int not null default 0,
+  word_count int not null default 0,
+  uploaded_at timestamptz not null default now()
+);
