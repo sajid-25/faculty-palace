@@ -2,7 +2,8 @@
 
 import { ChangeEvent, useState, useMemo } from "react";
 import Link from "next/link";
-import { useAuth } from "./context/AuthContext";
+import { usePathname, useRouter } from "next/navigation";
+import { useAuth, DEMO_USERS } from "./context/AuthContext";
 
 type Question = {
   number: string;
@@ -72,7 +73,20 @@ const initialQuestions: Question[] = [
   },
 ];
 
-const reportsList = [
+type ReportItem = {
+  id: string;
+  title: string;
+  course: string;
+  date: string;
+  qualityScore: number;
+  questionsCount: number;
+  coverageGaps: number;
+  similarities: number;
+  status: "Approved" | "Action Needed" | "Under Review";
+  recommendation: string;
+};
+
+const initialReports: ReportItem[] = [
   {
     id: "rep-1",
     title: "DBMS Final Exam Draft 2026",
@@ -113,9 +127,55 @@ const reportsList = [
 
 const navItems = ["Overview", "New analysis", "Question bank", "Reports"];
 
+function LandingPage() {
+  return (
+    <main className="landing-page">
+      <header className="landing-header">
+        <Link className="brand landing-brand" href="/">
+          <span className="brand-mark">A</span>
+          <span>assess<span>iq</span></span>
+        </Link>
+        <nav className="landing-nav" aria-label="Landing page navigation">
+          <a href="#how-it-works">How it works</a>
+          <a href="#roles">For faculty</a>
+          <Link href="/login">Sign in</Link>
+          <Link className="landing-cta" href="/register">Get started <span>→</span></Link>
+        </nav>
+      </header>
+
+      <section className="landing-hero">
+        <div className="landing-hero-copy">
+          <p className="eyebrow">ACADEMIC ASSESSMENT INTELLIGENCE</p>
+          <h1>Better exams begin<br />with <em>better questions.</em></h1>
+          <p className="landing-description">AssessIQ helps academic teams audit draft assessments, align questions to course outcomes, and build exams students can learn from.</p>
+          <div className="landing-actions"><Link className="landing-primary" href="/register">Create your workspace <span>→</span></Link><Link className="landing-secondary" href="/login">Already have an account? Sign in</Link></div>
+          <div className="landing-trust"><span className="trust-line" /><span>Built for thoughtful assessment teams</span></div>
+        </div>
+        <div className="landing-hero-visual" aria-label="Assessment quality overview preview">
+          <div className="visual-orbit orbit-one" /><div className="visual-orbit orbit-two" />
+          <div className="visual-report-card"><div className="visual-card-top"><span className="visual-card-kicker">LATEST AUDIT</span><span className="visual-status">● READY</span></div><h2>DBMS Final Exam</h2><p>Assessment quality report</p><div className="visual-score-row"><div className="visual-score"><strong>82</strong><span>/100</span></div><div className="visual-score-copy"><b>Strong foundation</b><small>↑ 8% from last assessment</small></div></div><div className="visual-bars"><i /><i /><i /><i /><i /></div><div className="visual-tags"><span>8 topics covered</span><span>24 questions</span></div></div>
+          <div className="visual-float visual-float-top"><span>✓</span><div><b>CO alignment</b><small>92% confidence</small></div></div><div className="visual-float visual-float-bottom"><span>!</span><div><b>2 coverage gaps</b><small>Worth a closer look</small></div></div>
+        </div>
+      </section>
+
+      <section className="landing-features" id="how-it-works"><div className="landing-section-heading"><p className="eyebrow">ONE CLEAR WORKFLOW</p><h2>From draft paper to confident decision.</h2></div><div className="feature-grid"><article><span className="feature-number">01</span><h3>Upload your materials</h3><p>Bring together your syllabus, course outcomes, and draft exam in one focused workspace.</p></article><article><span className="feature-number">02</span><h3>See what the questions reveal</h3><p>Map topics, outcomes, Bloom&apos;s levels, coverage gaps, and repeated questions at a glance.</p></article><article><span className="feature-number">03</span><h3>Improve with purpose</h3><p>Give every finding a reason and an actionable next step before the paper reaches students.</p></article></div></section>
+
+      <section className="landing-roles" id="roles"><div><p className="eyebrow">DESIGNED FOR THE WHOLE TEAM</p><h2>One standard.<br /><em>Three perspectives.</em></h2></div><p>Role-based workspaces give instructors, department heads, and external examiners the right level of visibility and control.</p><Link className="landing-secondary" href="/register">Choose your role <span>→</span></Link></section>
+      <footer className="landing-footer"><span>© 2026 AssessIQ</span><span>Assessment quality assurance, made clearer.</span><Link href="/login">Sign in to workspace ↗</Link></footer>
+    </main>
+  );
+}
+
 export default function Home() {
-  const { user, isLoggedIn, logout, login } = useAuth();
+  const { user, roleConfig, isLoggedIn, isLoading, logout, login, can } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
   const [activeNav, setActiveNav] = useState("Overview");
+
+  // Reports state
+  const [reports, setReports] = useState<ReportItem[]>(initialReports);
+  const [selectedReportId, setSelectedReportId] = useState("rep-1");
+  const [approvalToast, setApprovalToast] = useState<string | null>(null);
 
   // Overview states
   const [syllabus, setSyllabus] = useState<string | null>(null);
@@ -144,9 +204,6 @@ export default function Home() {
   const [newQuestionCO, setNewQuestionCO] = useState("CO2");
   const [newQuestionBloom, setNewQuestionBloom] = useState<Question["bloom"]>("Apply");
   const [newQuestionMarks, setNewQuestionMarks] = useState("05");
-
-  // Reports state
-  const [selectedReportId, setSelectedReportId] = useState("rep-1");
 
   const handleFile = (event: ChangeEvent<HTMLInputElement>, type: "syllabus" | "exam") => {
     const file = event.target.files?.[0];
@@ -209,6 +266,18 @@ export default function Home() {
     setShowAddModal(false);
   };
 
+  const handleUpdateReportStatus = (id: string, newStatus: ReportItem["status"]) => {
+    setReports((prev) =>
+      prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
+    );
+    setApprovalToast(
+      newStatus === "Approved"
+        ? "✓ Exam Draft Approved! Official printable version generated."
+        : "↺ Revision requested. Feedback sent to Course Instructor."
+    );
+    setTimeout(() => setApprovalToast(null), 3500);
+  };
+
   const filteredQuestions = useMemo(() => {
     return questions.filter((q) => {
       const matchesSearch =
@@ -223,8 +292,36 @@ export default function Home() {
   }, [questions, searchQuery, selectedBloom, selectedCO, onlyFlagged]);
 
   const activeReport = useMemo(() => {
-    return reportsList.find((r) => r.id === selectedReportId) || reportsList[0];
-  }, [selectedReportId]);
+    const availableReports = user?.role === "admin"
+      ? reports
+      : user?.role === "reviewer"
+      ? reports.filter((report) => report.status === "Approved")
+      : reports.filter((report) => report.id === "rep-1");
+    return availableReports.find((r) => r.id === selectedReportId) || availableReports[0];
+  }, [reports, selectedReportId, user?.role]);
+
+  const accessibleReports = user?.role === "admin"
+    ? reports
+    : user?.role === "reviewer"
+    ? reports.filter((report) => report.status === "Approved")
+    : reports.filter((report) => report.id === "rep-1");
+
+  const visibleNavItems = user?.role === "reviewer"
+    ? ["Overview", "Question bank", "Reports"]
+    : navItems;
+
+  if (isLoading) {
+    return <div className="route-loading">Loading your AssessIQ workspace...</div>;
+  }
+
+  if (pathname === "/" && !isLoggedIn) {
+    return <LandingPage />;
+  }
+
+  if (pathname === "/dashboard" && !isLoggedIn) {
+    router.replace("/login");
+    return <div className="route-loading">Checking your workspace access...</div>;
+  }
 
   return (
     <main className="app-shell">
@@ -234,32 +331,30 @@ export default function Home() {
           <span className="brand-mark">A</span>
           <span>assess<span>iq</span></span>
         </div>
-        
+
         <div className="workspace-switcher">
           <span className="workspace-dot">{isLoggedIn ? (user?.initials || "FP") : "🔒"}</span>
-          <span>
-            <small>WORKSPACE</small>
-            {isLoggedIn ? "Faculty Palace" : "Guest Mode"}
-          </span>
+          <div>
+            <small>ROLE-BASED WORKSPACE</small>
+            <strong>{isLoggedIn ? (roleConfig?.label || "Faculty") : "Guest Mode"}</strong>
+          </div>
           <b>⌄</b>
         </div>
 
         <nav className="main-nav" aria-label="Main navigation">
-          <p className="nav-label">Workspace</p>
-          {navItems.map((item, index) => {
+          <p className="nav-label">Navigation</p>
+          {visibleNavItems.map((item) => {
             const icons = ["◈", "+", "▦", "▤"];
+            const iconIndex = navItems.indexOf(item);
             return (
               <button
                 key={item}
                 className={activeNav === item ? "nav-item active" : "nav-item"}
-                onClick={() => {
-                  setActiveNav(item);
-                }}
+                onClick={() => setActiveNav(item)}
               >
-                <span className="nav-icon">{icons[index]}</span>
+                <span className="nav-icon">{icons[iconIndex]}</span>
                 {item}
-                {item === "Reports" && <span className="nav-count">3</span>}
-                {!isLoggedIn && index > 0 && <span className="lock-tag">Lock</span>}
+                {item === "Reports" && <span className="nav-count">{accessibleReports.length}</span>}
               </button>
             );
           })}
@@ -270,19 +365,19 @@ export default function Home() {
             <span className="help-icon">?</span>
             <div>
               <strong>AssessIQ Guide</strong>
-              <small>AI Assessment Auditing</small>
+              <small>Role-based Permissions</small>
             </div>
             <span>↗</span>
           </div>
 
           {isLoggedIn ? (
             <div className="profile-wrapper">
-              <button className="profile" title="Logged in faculty profile">
+              <button className="profile" title="Logged in user profile">
                 <span className="avatar">{user?.initials || "FA"}</span>
-                <span>
+                <div>
                   <strong>{user?.name}</strong>
-                  <small>{user?.role}</small>
-                </span>
+                  <small>{roleConfig?.label}</small>
+                </div>
               </button>
               <button className="sidebar-signout-btn" onClick={logout} title="Sign out">
                 Sign out
@@ -293,7 +388,7 @@ export default function Home() {
               <span className="guest-avatar">🔒</span>
               <div>
                 <strong>Guest Visitor</strong>
-                <small>Sign in to unlock all tools</small>
+                <small>Sign in to unlock roles</small>
               </div>
               <Link href="/login" className="guest-login-link">Sign in</Link>
             </div>
@@ -309,7 +404,13 @@ export default function Home() {
             <span>Workspace</span>
             <b>/</b>
             <strong>{activeNav}</strong>
-            {!isLoggedIn && <span className="guest-badge">Guest Preview</span>}
+            {isLoggedIn ? (
+              <span className={`role-pill topbar-role ${roleConfig?.badgeClass}`}>
+                {roleConfig?.label}
+              </span>
+            ) : (
+              <span className="guest-badge">Guest Preview</span>
+            )}
           </div>
 
           <div className="top-actions">
@@ -319,30 +420,37 @@ export default function Home() {
                   <span className="user-dot-online" />
                   <span>{user?.name}</span>
                 </div>
-                <button
-                  className="outline-button"
-                  onClick={() => setActiveNav("Question bank")}
-                >
-                  Question bank <span>↗</span>
-                </button>
                 <button className="signout-link-btn" onClick={logout}>
                   Sign out
                 </button>
               </>
             ) : (
               <>
-                <button
-                  className="demo-pill-btn"
-                  onClick={() => login("arjun.mehta@institution.edu", "Arjun Mehta", "Faculty Admin")}
-                  title="Instant 1-click Demo Login"
-                >
-                  ⚡ Instant Demo Login
-                </button>
+                <div className="guest-demo-pills">
+                  <button
+                    className="demo-pill-btn admin"
+                    onClick={() => void login(DEMO_USERS.admin.email, "AssessIQDemo123!")}
+                  >
+                    🏛 Dept Head
+                  </button>
+                  <button
+                    className="demo-pill-btn faculty"
+                    onClick={() => void login(DEMO_USERS.faculty.email, "AssessIQDemo123!")}
+                  >
+                    👨‍🏫 Instructor
+                  </button>
+                  <button
+                    className="demo-pill-btn reviewer"
+                    onClick={() => void login(DEMO_USERS.reviewer.email, "AssessIQDemo123!")}
+                  >
+                    🔍 Reviewer
+                  </button>
+                </div>
                 <Link className="auth-link auth-link-muted" href="/login">
                   Sign in
                 </Link>
                 <Link className="auth-link auth-link-primary" href="/register">
-                  Create account <span>→</span>
+                  Register <span>→</span>
                 </Link>
               </>
             )}
@@ -355,188 +463,205 @@ export default function Home() {
           {!isLoggedIn ? (
             <section className="auth-gate-banner">
               <div className="gate-card">
-                <div className="gate-tag">ACCESS RESTRICTED</div>
+                <div className="gate-tag">ROLE-BASED ACADEMIC AUDITING</div>
                 <h2>Sign in to access your assessment workspace</h2>
                 <p className="gate-description">
-                  AssessIQ empowers faculty to analyze draft exams, verify Bloom&apos;s Taxonomy alignment,
-                  detect historical repetitions via vector embeddings, and guarantee Course Outcome coverage.
+                  AssessIQ enforces role-based access control (RBAC). Course Instructors upload draft exams and run AI audits,
+                  Department Heads approve papers for printing, and External Examiners conduct independent moderation.
                 </p>
 
-                <div className="gate-features-grid">
-                  <div className="gate-feature-item">
-                    <span className="feat-icon">🎯</span>
-                    <div>
-                      <strong>Bloom&apos;s Taxonomy Classification</strong>
-                      <small>Automatic cognitive balance mapping from Remember to Create.</small>
-                    </div>
+                <div className="gate-roles-overview">
+                  <div className="role-showcase-card">
+                    <span className="role-icon">🏛</span>
+                    <strong>Department Head / Admin</strong>
+                    <p>Approve or request revisions on exam papers, audit cross-course outcomes, and manage question archives.</p>
+                    <button
+                      className="role-launch-btn"
+                      onClick={() => void login(DEMO_USERS.admin.email, "AssessIQDemo123!")}
+                    >
+                      Enter as Dept Head →
+                    </button>
                   </div>
-                  <div className="gate-feature-item">
-                    <span className="feat-icon">📑</span>
-                    <div>
-                      <strong>Syllabus & CO Coverage</strong>
-                      <small>Identify uncovered modules and mark distribution imbalances.</small>
-                    </div>
+
+                  <div className="role-showcase-card">
+                    <span className="role-icon">👨‍🏫</span>
+                    <strong>Course Instructor</strong>
+                    <p>Upload syllabus & draft exams, launch AI audits for Bloom & CO coverage, and generate question suggestions.</p>
+                    <button
+                      className="role-launch-btn"
+                      onClick={() => void login(DEMO_USERS.faculty.email, "AssessIQDemo123!")}
+                    >
+                      Enter as Instructor →
+                    </button>
                   </div>
-                  <div className="gate-feature-item">
-                    <span className="feat-icon">⚡</span>
-                    <div>
-                      <strong>Historical Repetition Detection</strong>
-                      <small>pgvector similarity matching against past question banks.</small>
-                    </div>
-                  </div>
-                  <div className="gate-feature-item">
-                    <span className="feat-icon">💡</span>
-                    <div>
-                      <strong>AI Suggestions & Replacements</strong>
-                      <small>Generative suggestions to balance skewed exams in 1-click.</small>
-                    </div>
+
+                  <div className="role-showcase-card">
+                    <span className="role-icon">🔍</span>
+                    <strong>External Examiner</strong>
+                    <p>Moderation review of draft assessments, verification of cognitive balance, and compliance checks.</p>
+                    <button
+                      className="role-launch-btn"
+                      onClick={() => void login(DEMO_USERS.reviewer.email, "AssessIQDemo123!")}
+                    >
+                      Enter as Examiner →
+                    </button>
                   </div>
                 </div>
 
-                <div className="gate-cta-row">
-                  <button
-                    className="primary-button gate-primary"
-                    onClick={() => login("arjun.mehta@institution.edu", "Arjun Mehta", "Faculty Admin")}
-                  >
-                    <span>⚡ Quick Sign In as Demo Faculty</span>
-                    <span>→</span>
-                  </button>
+                <div className="gate-cta-row mt-6">
                   <Link href="/login" className="outline-button gate-outline">
                     Sign in with credentials
                   </Link>
                   <Link href="/register" className="text-button gate-text">
-                    Create new account <span>↗</span>
+                    Create new account with custom role <span>↗</span>
                   </Link>
-                </div>
-              </div>
-
-              {/* Blurred Read-only Preview */}
-              <div className="gate-preview-teaser">
-                <div className="teaser-overlay">
-                  <span className="lock-icon">🔒</span>
-                  <p>Sign in above to interact with live assessments and reports</p>
-                </div>
-                <div className="metric-grid teaser-metrics">
-                  <div className="metric-card accent">
-                    <span className="metric-label">QUALITY SCORE</span>
-                    <strong>82<span>/100</span></strong>
-                    <div className="metric-trend up">↑ 8% vs last year</div>
-                  </div>
-                  <div className="metric-card">
-                    <span className="metric-label">QUESTIONS PARSED</span>
-                    <strong>24</strong>
-                    <div className="metric-trend neutral">24 of 24 recognized</div>
-                  </div>
-                  <div className="metric-card">
-                    <span className="metric-label">TOPICS COVERED</span>
-                    <strong>8<span>/10</span></strong>
-                    <div className="metric-trend warn">2 gaps need attention</div>
-                  </div>
-                  <div className="metric-card">
-                    <span className="metric-label">SIMILARITY FLAGS</span>
-                    <strong>3</strong>
-                    <div className="metric-trend down">↓ 2 vs previous exam</div>
-                  </div>
                 </div>
               </div>
             </section>
           ) : (
-            /* Logged in: User can access all things! */
+            /* Logged in: Role-Tailored Workspace */
             <>
+              {/* Role Scope Banner */}
+              <div className="role-scope-banner">
+                <div className="scope-info">
+                  <span className={`role-pill ${roleConfig?.badgeClass}`}>
+                    {roleConfig?.label} Access
+                  </span>
+                  <p>{roleConfig?.description}</p>
+                </div>
+                {user?.role === "admin" && (
+                  <span className="scope-privilege-tag">✓ Exam Paper Approval Authority</span>
+                )}
+                {user?.role === "reviewer" && (
+                  <span className="scope-privilege-tag reviewer">👁 Moderation Inspection Mode</span>
+                )}
+              </div>
+
+              {/* Toast message if admin approved report */}
+              {approvalToast && (
+                <div className="approval-floating-toast" role="status">
+                  <span>{approvalToast.startsWith("✓") ? "✓" : "↺"}</span>
+                  <p>{approvalToast}</p>
+                </div>
+              )}
+
               {/* TAB 1: OVERVIEW */}
               {activeNav === "Overview" && (
                 <>
                   <section className="intro">
                     <div>
-                      <p className="eyebrow">FACULTY ASSESSMENT PORTAL · 2026</p>
+                      <p className="eyebrow">{roleConfig?.title.toUpperCase()} · 2026</p>
                       <h1>
-                        Good morning, {user?.name?.split(" ")[0] || "Professor"}
+                        Good morning, {user?.name?.split(" ")[0]}
                         <span>.</span>
                       </h1>
                       <p className="intro-copy">
-                        You have full access to your workspace. Turn your draft assessments into clear, confident decisions.
+                        {user?.role === "admin"
+                          ? "You have department-wide auditing authority. Review draft assessments and authorize final exams."
+                          : user?.role === "reviewer"
+                          ? "You are moderating department assessments. Inspect Bloom balances and syllabus coverage."
+                          : "Upload and audit your course draft assessments to align outcomes and cognitive depth."}
                       </p>
                     </div>
                     <div className="intro-status">
                       <span className="status-dot" /> System ready{" "}
-                      <span className="status-divider" /> pgvector + Groq active
+                      <span className="status-divider" /> {roleConfig?.label} Mode
                     </div>
                   </section>
 
-                  {/* Upload Section */}
+                  {/* Upload Section - Role Controlled */}
                   <section className="upload-section">
                     <div className="section-heading">
                       <div>
-                        <p className="eyebrow">QUICK AUDIT</p>
-                        <h2>Analyze a new assessment</h2>
+                        <p className="eyebrow">QUICK ASSESSMENT AUDIT</p>
+                        <h2>Analyze an assessment paper</h2>
                       </div>
                       <span className="step-label">
                         <b>01</b> Upload documents <i /> <span>02</span> Review insights
                       </span>
                     </div>
 
-                    <div className="upload-grid">
-                      <label className={syllabus ? "upload-card uploaded" : "upload-card"}>
-                        <input
-                          type="file"
-                          accept=".pdf,.doc,.docx"
-                          onChange={(event) => handleFile(event, "syllabus")}
-                        />
-                        <span className="upload-symbol">{syllabus ? "✓" : "↑"}</span>
-                        <span className="upload-title">{syllabus || "Add your syllabus"}</span>
-                        <span className="upload-detail">
-                          {syllabus ? "Ready to analyze" : "PDF, DOCX up to 10 MB"}
-                        </span>
-                        <span className="upload-action">
-                          {syllabus ? "Replace file" : "Browse files"}
-                        </span>
-                      </label>
-
-                      <label className={exam ? "upload-card uploaded" : "upload-card"}>
-                        <input
-                          type="file"
-                          accept=".pdf,.doc,.docx"
-                          onChange={(event) => handleFile(event, "exam")}
-                        />
-                        <span className="upload-symbol">{exam ? "✓" : "↑"}</span>
-                        <span className="upload-title">{exam || "Add your draft exam"}</span>
-                        <span className="upload-detail">
-                          {exam ? "Ready to analyze" : "PDF, DOCX up to 10 MB"}
-                        </span>
-                        <span className="upload-action">
-                          {exam ? "Replace file" : "Browse files"}
-                        </span>
-                      </label>
-
-                      <div className="analysis-launch">
+                    {!can("upload") ? (
+                      <div className="reviewer-readonly-box">
+                        <span className="box-icon">👁</span>
                         <div>
-                          <span className="launch-number">{syllabus && exam ? "✓" : "2"}</span>
+                          <strong>External Examiner Read-Only Mode</strong>
                           <p>
-                            <strong>Documents required</strong>
-                            <small>
-                              {syllabus && exam
-                                ? "Both documents loaded. Ready for Groq + pgvector analysis."
-                                : "Upload both syllabus and draft exam to launch analysis."}
-                            </small>
+                            Exam paper uploads are restricted to Course Instructors and Department Admins.
+                            You can inspect existing evaluated papers and historical similarity reports below.
                           </p>
                         </div>
                         <button
-                          className="primary-button"
-                          disabled={!syllabus || !exam || isAnalyzing}
-                          onClick={runAnalysis}
+                          className="outline-button"
+                          onClick={() => setActiveNav("Reports")}
                         >
-                          {isAnalyzing ? "Analyzing assessment..." : "Run analysis"}
-                          <span>→</span>
+                          View Reports Archive ↗
                         </button>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="upload-grid">
+                        <label className={syllabus ? "upload-card uploaded" : "upload-card"}>
+                          <input
+                            type="file"
+                            accept=".pdf,.doc,.docx"
+                            onChange={(event) => handleFile(event, "syllabus")}
+                          />
+                          <span className="upload-symbol">{syllabus ? "✓" : "↑"}</span>
+                          <span className="upload-title">{syllabus || "Add your syllabus"}</span>
+                          <span className="upload-detail">
+                            {syllabus ? "Ready to analyze" : "PDF, DOCX up to 10 MB"}
+                          </span>
+                          <span className="upload-action">
+                            {syllabus ? "Replace file" : "Browse files"}
+                          </span>
+                        </label>
+
+                        <label className={exam ? "upload-card uploaded" : "upload-card"}>
+                          <input
+                            type="file"
+                            accept=".pdf,.doc,.docx"
+                            onChange={(event) => handleFile(event, "exam")}
+                          />
+                          <span className="upload-symbol">{exam ? "✓" : "↑"}</span>
+                          <span className="upload-title">{exam || "Add your draft exam"}</span>
+                          <span className="upload-detail">
+                            {exam ? "Ready to analyze" : "PDF, DOCX up to 10 MB"}
+                          </span>
+                          <span className="upload-action">
+                            {exam ? "Replace file" : "Browse files"}
+                          </span>
+                        </label>
+
+                        <div className="analysis-launch">
+                          <div>
+                            <span className="launch-number">{syllabus && exam ? "✓" : "2"}</span>
+                            <p>
+                              <strong>Documents required</strong>
+                              <small>
+                                {syllabus && exam
+                                  ? "Both documents loaded. Ready for Groq + pgvector analysis."
+                                  : "Upload syllabus and draft exam to launch analysis."}
+                              </small>
+                            </p>
+                          </div>
+                          <button
+                            className="primary-button"
+                            disabled={!syllabus || !exam || isAnalyzing}
+                            onClick={runAnalysis}
+                          >
+                            {isAnalyzing ? "Analyzing assessment..." : "Run analysis"}
+                            <span>→</span>
+                          </button>
+                        </div>
+                      </div>
+                    )}
 
                     {analysisComplete && (
                       <div className="analysis-success-toast">
                         <span>✓</span>
                         <div>
                           <strong>Audit completed successfully!</strong>
-                          <small>24 questions segmented, Bloom levels classified, and 3 similarity alerts generated below.</small>
+                          <small>24 questions parsed, Bloom levels classified, and 3 similarity alerts generated below.</small>
                         </div>
                         <button onClick={() => setActiveNav("Reports")}>View full report →</button>
                       </div>
@@ -565,7 +690,7 @@ export default function Home() {
                       <div className="metric-card">
                         <span className="metric-label">QUESTIONS PARSED</span>
                         <strong>24</strong>
-                        <div className="metric-trend neutral">24 of 24 <small>questions recognized</small></div>
+                        <div className="metric-trend neutral">24 of 24 <small>recognized</small></div>
                       </div>
                       <div className="metric-card">
                         <span className="metric-label">TOPICS COVERED</span>
@@ -575,7 +700,7 @@ export default function Home() {
                       <div className="metric-card">
                         <span className="metric-label">SIMILARITY FLAGS</span>
                         <strong>3</strong>
-                        <div className="metric-trend down">↓ 2 <small>vs last assessment</small></div>
+                        <div className="metric-trend down">↓ 2 <small>vs last exam</small></div>
                       </div>
                     </div>
 
@@ -669,7 +794,7 @@ export default function Home() {
                           <span>!</span>
                           <div>
                             <strong>Actionable recommendation</strong>
-                            <small>Consider replacing 1 duplicate understand question with an evaluation question.</small>
+                            <small>Replace 1 duplicate understand question with an evaluation question.</small>
                           </div>
                           <button
                             onClick={() => setActiveNav("Reports")}
@@ -697,156 +822,172 @@ export default function Home() {
                     </button>
                   </div>
 
-                  <div className="wizard-container">
-                    <div className="wizard-card">
-                      <div className="wizard-step-header">
-                        <span className="step-badge">Step 1</span>
-                        <h3>Course & Assessment Metadata</h3>
+                  {!can("configureAudit") ? (
+                    <div className="reviewer-readonly-box">
+                      <span className="box-icon">🔍</span>
+                      <div>
+                        <strong>External Examiner View</strong>
+                        <p>
+                          Configuration of new audits is reserved for Course Instructors and Department Administrators.
+                          You can review finalized results in the Reports tab.
+                        </p>
                       </div>
-                      <div className="form-grid-2">
-                        <label>
-                          Target Course
-                          <select
-                            value={wizardCourse}
-                            onChange={(e) => setWizardCourse(e.target.value)}
-                            className="input-control"
-                          >
-                            <option>CSE 3105 - Database Management Systems</option>
-                            <option>CSE 2101 - Data Structures & Algorithms</option>
-                            <option>CSE 3201 - Algorithm Design</option>
-                            <option>CSE 4107 - Artificial Intelligence</option>
-                          </select>
-                        </label>
-                        <label>
-                          Assessment Type
-                          <select
-                            value={wizardExamType}
-                            onChange={(e) => setWizardExamType(e.target.value)}
-                            className="input-control"
-                          >
-                            <option>Final Exam Draft</option>
-                            <option>Midterm Exam Draft</option>
-                            <option>Class Test / Quiz</option>
-                            <option>Supplementary Exam</option>
-                          </select>
-                        </label>
-                      </div>
-
-                      <div className="wizard-step-header mt-6">
-                        <span className="step-badge">Step 2</span>
-                        <h3>Upload Documents</h3>
-                      </div>
-                      <div className="upload-grid">
-                        <label className={wizardSyllabus ? "upload-card uploaded" : "upload-card"}>
-                          <input
-                            type="file"
-                            accept=".pdf,.docx,.txt"
-                            onChange={(e) => setWizardSyllabus(e.target.files?.[0]?.name || null)}
-                          />
-                          <span className="upload-symbol">{wizardSyllabus ? "✓" : "↑"}</span>
-                          <span className="upload-title">{wizardSyllabus || "Upload Syllabus & COs"}</span>
-                          <span className="upload-detail">PDF or DOCX containing topics & COs</span>
-                          <span className="upload-action">{wizardSyllabus ? "Replace file" : "Select file"}</span>
-                        </label>
-
-                        <label className={wizardExam ? "upload-card uploaded" : "upload-card"}>
-                          <input
-                            type="file"
-                            accept=".pdf,.docx,.txt"
-                            onChange={(e) => setWizardExam(e.target.files?.[0]?.name || null)}
-                          />
-                          <span className="upload-symbol">{wizardExam ? "✓" : "↑"}</span>
-                          <span className="upload-title">{wizardExam || "Upload Draft Exam Paper"}</span>
-                          <span className="upload-detail">Exam questions with marks breakdown</span>
-                          <span className="upload-action">{wizardExam ? "Replace file" : "Select file"}</span>
-                        </label>
-
-                        <div className="wizard-quick-fill">
-                          <strong>Demo Quick Fill</strong>
-                          <p>Load sample Data Structures syllabus and draft exam in one click:</p>
-                          <button
-                            type="button"
-                            className="outline-button"
-                            onClick={() => {
-                              setWizardSyllabus("CSE_3105_DBMS_Syllabus.pdf");
-                              setWizardExam("DBMS_Final_Exam_Draft_2026.pdf");
-                            }}
-                          >
-                            ⚡ Load Sample Files
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="wizard-step-header mt-6">
-                        <span className="step-badge">Step 3</span>
-                        <h3>Audit Parameters</h3>
-                      </div>
-                      <div className="form-grid-3">
-                        <div className="param-card">
-                          <small>SIMILARITY THRESHOLD</small>
-                          <strong>0.80 (pgvector cosine)</strong>
-                          <span>Flag repetitions above 80% similarity</span>
-                        </div>
-                        <div className="param-card">
-                          <small>LLM ENGINE</small>
-                          <strong>Groq (Llama-3.3-70B)</strong>
-                          <span>High-fidelity Bloom & CO classification</span>
-                        </div>
-                        <div className="param-card">
-                          <small>TARGET HIGHER-ORDER BLOOM</small>
-                          <strong>&gt;= 35%</strong>
-                          <span>Apply, Analyze, Evaluate, Create</span>
-                        </div>
-                      </div>
-
-                      {wizardProgress > 0 && (
-                        <div className="wizard-progress-bar-wrap">
-                          <div className="progress-labels">
-                            <span>{wizardStepText}</span>
-                            <strong>{wizardProgress}%</strong>
-                          </div>
-                          <div className="progress-track">
-                            <div
-                              className="progress-fill"
-                              style={{ width: `${wizardProgress}%` }}
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      {wizardFinished && (
-                        <div className="wizard-finished-card">
-                          <span className="check-large">✓</span>
-                          <div>
-                            <h4>Audit Pipeline Completed!</h4>
-                            <p>
-                              Mapped {wizardCourse} across 8 topics and 4 COs. Overall Assessment Quality Score: <strong>86/100</strong>.
-                            </p>
-                          </div>
-                          <button
-                            className="primary-button"
-                            onClick={() => setActiveNav("Reports")}
-                          >
-                            <span>Open Detailed Audit Report</span>
-                            <span>→</span>
-                          </button>
-                        </div>
-                      )}
-
-                      {!wizardFinished && (
-                        <div className="wizard-submit-row">
-                          <button
-                            className="primary-button launch-big-btn"
-                            disabled={!wizardSyllabus || !wizardExam || wizardProgress > 0}
-                            onClick={runWizardAnalysis}
-                          >
-                            <span>{wizardProgress > 0 ? "Analyzing..." : "Launch AI Assessment Audit"}</span>
-                            <span>→</span>
-                          </button>
-                        </div>
-                      )}
+                      <button className="primary-button" onClick={() => setActiveNav("Reports")}>
+                        Go to Reports Archive →
+                      </button>
                     </div>
-                  </div>
+                  ) : (
+                    <div className="wizard-container">
+                      <div className="wizard-card">
+                        <div className="wizard-step-header">
+                          <span className="step-badge">Step 1</span>
+                          <h3>Course & Assessment Metadata</h3>
+                        </div>
+                        <div className="form-grid-2">
+                          <label>
+                            Target Course
+                            <select
+                              value={wizardCourse}
+                              onChange={(e) => setWizardCourse(e.target.value)}
+                              className="input-control"
+                            >
+                              <option>CSE 3105 - Database Management Systems</option>
+                              <option>CSE 2101 - Data Structures & Algorithms</option>
+                              <option>CSE 3201 - Algorithm Design</option>
+                              <option>CSE 4107 - Artificial Intelligence</option>
+                            </select>
+                          </label>
+                          <label>
+                            Assessment Type
+                            <select
+                              value={wizardExamType}
+                              onChange={(e) => setWizardExamType(e.target.value)}
+                              className="input-control"
+                            >
+                              <option>Final Exam Draft</option>
+                              <option>Midterm Exam Draft</option>
+                              <option>Class Test / Quiz</option>
+                              <option>Supplementary Exam</option>
+                            </select>
+                          </label>
+                        </div>
+
+                        <div className="wizard-step-header mt-6">
+                          <span className="step-badge">Step 2</span>
+                          <h3>Upload Documents</h3>
+                        </div>
+                        <div className="upload-grid">
+                          <label className={wizardSyllabus ? "upload-card uploaded" : "upload-card"}>
+                            <input
+                              type="file"
+                              accept=".pdf,.docx,.txt"
+                              onChange={(e) => setWizardSyllabus(e.target.files?.[0]?.name || null)}
+                            />
+                            <span className="upload-symbol">{wizardSyllabus ? "✓" : "↑"}</span>
+                            <span className="upload-title">{wizardSyllabus || "Upload Syllabus & COs"}</span>
+                            <span className="upload-detail">PDF or DOCX containing topics & COs</span>
+                            <span className="upload-action">{wizardSyllabus ? "Replace file" : "Select file"}</span>
+                          </label>
+
+                          <label className={wizardExam ? "upload-card uploaded" : "upload-card"}>
+                            <input
+                              type="file"
+                              accept=".pdf,.docx,.txt"
+                              onChange={(e) => setWizardExam(e.target.files?.[0]?.name || null)}
+                            />
+                            <span className="upload-symbol">{wizardExam ? "✓" : "↑"}</span>
+                            <span className="upload-title">{wizardExam || "Upload Draft Exam Paper"}</span>
+                            <span className="upload-detail">Exam questions with marks breakdown</span>
+                            <span className="upload-action">{wizardExam ? "Replace file" : "Select file"}</span>
+                          </label>
+
+                          <div className="wizard-quick-fill">
+                            <strong>Demo Quick Fill</strong>
+                            <p>Load sample DBMS syllabus and draft exam in one click:</p>
+                            <button
+                              type="button"
+                              className="outline-button"
+                              onClick={() => {
+                                setWizardSyllabus("CSE_3105_DBMS_Syllabus.pdf");
+                                setWizardExam("DBMS_Final_Exam_Draft_2026.pdf");
+                              }}
+                            >
+                              ⚡ Load Sample Files
+                            </button>
+                          </div>
+                        </div>
+
+                        <div className="wizard-step-header mt-6">
+                          <span className="step-badge">Step 3</span>
+                          <h3>Audit Parameters</h3>
+                        </div>
+                        <div className="form-grid-3">
+                          <div className="param-card">
+                            <small>SIMILARITY THRESHOLD</small>
+                            <strong>0.80 (pgvector cosine)</strong>
+                            <span>Flag repetitions above 80% similarity</span>
+                          </div>
+                          <div className="param-card">
+                            <small>LLM ENGINE</small>
+                            <strong>Groq (Llama-3.3-70B)</strong>
+                            <span>High-fidelity Bloom & CO classification</span>
+                          </div>
+                          <div className="param-card">
+                            <small>TARGET HIGHER-ORDER BLOOM</small>
+                            <strong>&gt;= 35%</strong>
+                            <span>Apply, Analyze, Evaluate, Create</span>
+                          </div>
+                        </div>
+
+                        {wizardProgress > 0 && (
+                          <div className="wizard-progress-bar-wrap">
+                            <div className="progress-labels">
+                              <span>{wizardStepText}</span>
+                              <strong>{wizardProgress}%</strong>
+                            </div>
+                            <div className="progress-track">
+                              <div
+                                className="progress-fill"
+                                style={{ width: `${wizardProgress}%` }}
+                              />
+                            </div>
+                          </div>
+                        )}
+
+                        {wizardFinished && (
+                          <div className="wizard-finished-card">
+                            <span className="check-large">✓</span>
+                            <div>
+                              <h4>Audit Pipeline Completed!</h4>
+                              <p>
+                                Mapped {wizardCourse} across 8 topics and 4 COs. Overall Assessment Quality Score: <strong>86/100</strong>.
+                              </p>
+                            </div>
+                            <button
+                              className="primary-button"
+                              onClick={() => setActiveNav("Reports")}
+                            >
+                              <span>Open Detailed Audit Report</span>
+                              <span>→</span>
+                            </button>
+                          </div>
+                        )}
+
+                        {!wizardFinished && (
+                          <div className="wizard-submit-row">
+                            <button
+                              className="primary-button launch-big-btn"
+                              disabled={!wizardSyllabus || !wizardExam || wizardProgress > 0}
+                              onClick={runWizardAnalysis}
+                            >
+                              <span>{wizardProgress > 0 ? "Analyzing..." : "Launch AI Assessment Audit"}</span>
+                              <span>→</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </section>
               )}
 
@@ -859,12 +1000,16 @@ export default function Home() {
                       <h2>Question Bank & Similarity Archive</h2>
                     </div>
                     <div className="bank-top-actions">
-                      <button
-                        className="primary-button"
-                        onClick={() => setShowAddModal(true)}
-                      >
-                        + Add Question to Bank
-                      </button>
+                      {can("editBank") ? (
+                        <button
+                          className="primary-button"
+                          onClick={() => setShowAddModal(true)}
+                        >
+                          + Add Question to Bank
+                        </button>
+                      ) : (
+                        <span className="badge-readonly">Read-Only Moderation Mode</span>
+                      )}
                     </div>
                   </div>
 
@@ -926,7 +1071,7 @@ export default function Home() {
                   </div>
 
                   {/* Add Question Modal */}
-                  {showAddModal && (
+                  {showAddModal && can("editBank") && (
                     <div className="modal-backdrop">
                       <div className="modal-card">
                         <div className="modal-header">
@@ -1062,7 +1207,7 @@ export default function Home() {
                   <div className="section-heading">
                     <div>
                       <p className="eyebrow">ASSESSMENT AUDIT HISTORY</p>
-                      <h2>Auditing Reports & Recommendations</h2>
+                      <h2>Auditing Reports & Governance</h2>
                     </div>
                     <div className="report-action-buttons">
                       <button
@@ -1092,8 +1237,8 @@ export default function Home() {
                   <div className="reports-layout">
                     {/* Left: Report selector */}
                     <div className="reports-sidebar-list">
-                      <h3>Generated Reports</h3>
-                      {reportsList.map((r) => (
+                      <h3>Department Audit Reports</h3>
+                      {accessibleReports.map((r) => (
                         <div
                           key={r.id}
                           className={r.id === selectedReportId ? "report-item active" : "report-item"}
@@ -1120,12 +1265,49 @@ export default function Home() {
                         <div>
                           <span className="eyebrow">{activeReport.course}</span>
                           <h2>{activeReport.title}</h2>
-                          <p className="detail-date">Audited on {activeReport.date} · Evaluator: {user?.name}</p>
+                          <p className="detail-date">Audited on {activeReport.date} · Evaluator: {user?.name} ({roleConfig?.label})</p>
                         </div>
                         <div className="score-badge-large">
                           <strong>{activeReport.qualityScore}</strong>
                           <span>/ 100 Quality</span>
                         </div>
+                      </div>
+
+                      {/* Role-Specific Action Bar: Admin Approval Authority */}
+                      <div className="admin-governance-bar">
+                        <div className="gov-info">
+                          <span className="gov-tag">EXAM COMMITTEE GOVERNANCE</span>
+                          <p>
+                            Current Status: <strong className={`status-text ${activeReport.status.toLowerCase().replace(/\s+/g, "-")}`}>{activeReport.status}</strong>
+                          </p>
+                        </div>
+
+                        {can("approve") ? (
+                          <div className="gov-actions">
+                            <button
+                              className="btn-approve"
+                              onClick={() => handleUpdateReportStatus(activeReport.id, "Approved")}
+                              disabled={activeReport.status === "Approved"}
+                            >
+                              ✓ {activeReport.status === "Approved" ? "Paper Approved" : "Approve Exam Paper"}
+                            </button>
+                            <button
+                              className="btn-reject"
+                              onClick={() => handleUpdateReportStatus(activeReport.id, "Action Needed")}
+                              disabled={activeReport.status === "Action Needed"}
+                            >
+                              ↺ Request Revision
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="gov-note">
+                            <small>
+                              {user?.role === "reviewer"
+                                ? "👁 External moderation complete. Approval delegated to Department Head."
+                                : "ℹ Approval authority reserved for Exam Committee Chair / Dept Head."}
+                            </small>
+                          </div>
+                        )}
                       </div>
 
                       <div className="metric-grid">
@@ -1145,8 +1327,8 @@ export default function Home() {
                           <div className="metric-trend down">Historical overlap</div>
                         </div>
                         <div className="metric-card">
-                          <span className="metric-label">ALIGNMENT STATUS</span>
-                          <strong>{activeReport.status}</strong>
+                          <span className="metric-label">STATUS</span>
+                          <strong style={{ fontSize: "20px" }}>{activeReport.status}</strong>
                           <div className="metric-trend up">Accreditation Ready</div>
                         </div>
                       </div>

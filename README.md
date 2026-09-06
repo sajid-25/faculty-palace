@@ -1,8 +1,15 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+AssessIQ is a Next.js assessment auditing workspace with PostgreSQL-backed role authentication.
 
-## Getting Started
+## Run locally
 
-First, run the development server:
+1. Copy `.env.example` to `.env.local`.
+2. Start PostgreSQL and initialize the users and sessions tables:
+
+```bash
+docker compose up -d postgres
+```
+
+3. Start the development server:
 
 ```bash
 npm run dev
@@ -14,7 +21,17 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) with your browser.
+
+The seeded demo accounts all use the password `AssessIQDemo123!`:
+
+| Role | Email |
+| --- | --- |
+| Department Head | `sarah.rahman@institution.edu` |
+| Course Instructor | `arjun.mehta@institution.edu` |
+| External Examiner | `david.chen@external-board.edu` |
+
+Authentication uses PostgreSQL `users` and `sessions` tables, bcrypt password hashes, and an HTTP-only session cookie. The browser does not store the logged-in user as an authentication source.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
