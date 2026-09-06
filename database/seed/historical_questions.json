@@ -1,0 +1,170 @@
+[
+  {
+    "question": "Explain the services provided by the data link layer.",
+    "topic": "Data Link Layer",
+    "course_outcome": "CO1",
+    "bloom_level": "Understand",
+    "marks": 3,
+    "exam_year": 2024
+  },
+  {
+    "question": "Differentiate between a circuit-switched network and a packet-switched network.",
+    "topic": "Circuit Switching vs Packet Switching",
+    "course_outcome": "CO3",
+    "bloom_level": "Analyze",
+    "marks": 3,
+    "exam_year": 2024
+  },
+  {
+    "question": "Explain how a cache server can reduce the delay in receiving a requested object from the origin server.",
+    "topic": "Web Caching / Application Layer",
+    "course_outcome": "CO1",
+    "bloom_level": "Understand",
+    "marks": 3,
+    "exam_year": 2024
+  },
+  {
+    "question": "Differentiate between iterative query and recursive query for DNS resolution.",
+    "topic": "DNS",
+    "course_outcome": "CO3",
+    "bloom_level": "Analyze",
+    "marks": 3,
+    "exam_year": 2024
+  },
+  {
+    "question": "Explain the concept of Head of the Line (HoL) blocking at the input port of a router.",
+    "topic": "Router Architecture",
+    "course_outcome": "CO1",
+    "bloom_level": "Understand",
+    "marks": 3,
+    "exam_year": 2024
+  },
+  {
+    "question": "Explain the count-to-infinity problem in distance vector routing and how it can be tackled.",
+    "topic": "Routing Algorithms",
+    "course_outcome": "CO1",
+    "bloom_level": "Understand",
+    "marks": 3,
+    "exam_year": 2024
+  },
+  {
+    "question": "Explain Polling and Token Passing multiple access protocols along with their advantages and disadvantages.",
+    "topic": "Multiple Access Protocols",
+    "course_outcome": "CO3",
+    "bloom_level": "Analyze",
+    "marks": 3,
+    "exam_year": 2024
+  },
+  {
+    "question": "Suppose a packet is 2,500 bytes and the propagation speed on all three links is 2.5x10^8 m/s, the transmission rates of all three links are 2 Mbps, the packet switch processing delay is 5 msec, the length of the first link is 5,000 km, the length of the second link is 4,000 km, and the length of the last link is 1,000 km. For these values, calculate the end-to-end delay in milliseconds.",
+    "topic": "Network Delay and Throughput",
+    "course_outcome": "CO2",
+    "bloom_level": "Apply",
+    "marks": 5,
+    "exam_year": 2024
+  },
+  {
+    "question": "Consider a sender that sends the bit patterns 00101101, 10101101, 00110110, and 11101001 to a receiver over an ethernet channel, using two-dimensional parity row and column parity schemes. Demonstrate how the receiver would pinpoint the received bit patterns if the received data is 00101101, 10101111, 00110110, and 11101001.",
+    "topic": "Error Detection (Two-Dimensional Parity)",
+    "course_outcome": "CO4",
+    "bloom_level": "Apply",
+    "marks": 5,
+    "exam_year": 2024
+  },
+  {
+    "question": "An organization is granted a block of addresses with beginning address 192.168.10.0/24. The organization needs to have 14 subnets as shown below: two subnets each with 64 addresses, four subnets each with 16 addresses, four subnets each with 8 addresses, and four subnets each with 4 addresses. Construct a table showing the subnet mask, first address, and last address for each subnet.",
+    "topic": "IP Addressing and Subnetting",
+    "course_outcome": "CO4",
+    "bloom_level": "Apply",
+    "marks": 5,
+    "exam_year": 2024
+  },
+  {
+    "question": "Consider the generator G = 10011, and suppose that data D = 1010101010. Calculate the value of R (Cyclic Redundancy Check bits). Show how the receiver checks for the bit error when it receives data bits D = 1010101110.",
+    "topic": "Error Detection (CRC)",
+    "course_outcome": "CO4",
+    "bloom_level": "Apply",
+    "marks": 5,
+    "exam_year": 2024
+  },
+  {
+    "question": "Suppose that the three measured SampleRTT values are 106 ms, 120 ms, and 115 ms. Compute the EstimatedRTT after each of these SampleRTT values is obtained, using a value of alpha = 0.25 and assuming that the value of EstimatedRTT was 100 ms just before the first of these samples was obtained. Also, compute the DevRTT after each sample is obtained, assuming a value of beta = 0.15 and assuming the value of DevRTT was 10 ms just before the first of these three samples was obtained. Last, compute the TCP TimeoutInterval after each of these samples is obtained.",
+    "topic": "Transport Layer - RTT Estimation",
+    "course_outcome": "CO2",
+    "bloom_level": "Apply",
+    "marks": 5,
+    "exam_year": 2024
+  },
+  {
+    "question": "Consider sending a 7800-byte datagram into a link that has an MTU of 2120 bytes. Suppose the original datagram is stamped with an identification number of 137. Determine how many fragments will be generated and construct a table for the generated IP fragments showing this information: fragment number, datagram length, payload length, ID, fragmentation flag, and offset.",
+    "topic": "IP Fragmentation",
+    "course_outcome": "CO2",
+    "bloom_level": "Apply",
+    "marks": 5,
+    "exam_year": 2024
+  },
+  {
+    "question": "Using the RSA public key cryptosystem, with the letter a = 1, b = 2, ... y = 25, z = 26. If two prime numbers are p = 5 and q = 11, then encode the word \"aust\" by encrypting each letter separately. Apply the decryption algorithm to the encrypted version to recover the original plaintext message.",
+    "topic": "Network Security (RSA)",
+    "course_outcome": "CO4",
+    "bloom_level": "Apply",
+    "marks": 5,
+    "exam_year": 2024
+  },
+  {
+    "question": "Consider the given network. Use the distance-vector algorithm and show the distance table entries of each node for each round of advertisement until the algorithm reaches the quiescent state (i.e., no link cost changes are found).",
+    "topic": "Routing Algorithms",
+    "course_outcome": "CO2",
+    "bloom_level": "Apply",
+    "marks": 6,
+    "exam_year": 2024
+  },
+  {
+    "question": "Suppose you click on a link within your browser: http://www.aust.edu/cse, which consists of a base HTML file and 37 JPEG images, and all files reside on the same server. Show the steps with an appropriate figure for transferring the webpage from the server to the client in the case of a non-persistent HTTP connection. Compare the performance of non-persistent HTTP with persistent HTTP connection by calculating the total elapsed time for both the non-persistent and persistent HTTP connection from when a client requests the base HTML file until the entire 38 files are received by the client.",
+    "topic": "HTTP / Application Layer",
+    "course_outcome": "CO3",
+    "bloom_level": "Analyze",
+    "marks": 6,
+    "exam_year": 2024
+  },
+  {
+    "question": "Compare the performance of Go-Back-N and Selective Repeat protocols in terms of the number of retransmissions by analyzing their sender and receiver windows based on the following scenario, where a 3-bit field is used for sequence numbers: (i) Frame 0 is sent; Frame 0 is received. (ii) Frames 1 and 2 are sent; Frame 2 is received but Frame 1 is lost. (iii) Frames 3, 4, and 5 are sent; Frames 4 and 5 are received; Timer for Frame 3 expires.",
+    "topic": "Reliable Data Transfer (Go-Back-N vs Selective Repeat)",
+    "course_outcome": "CO3",
+    "bloom_level": "Analyze",
+    "marks": 6,
+    "exam_year": 2024
+  },
+  {
+    "question": "TCP uses a method called congestion control to regulate the traffic entering the network. The behavior of TCP congestion control can be represented as a graph in which the x-axis indicates the time (transmission round), and the y-axis indicates the congestion window size. Examine the given graph and answer the following, providing a brief justification for each answer: (i) Identify the intervals of time when TCP slow start is operating. (ii) Identify the intervals of time when TCP congestion avoidance is operating. (iii) After the 16th and 22nd transmission rounds, is segment loss detected by a triple duplicate ACK or by a timeout? (iv) What is the initial value of ssthresh at the first transmission round? (v) What is the value of ssthresh at the 18th transmission round? (vi) During what transmission round is the 36th segment sent?",
+    "topic": "TCP Congestion Control",
+    "course_outcome": "CO3",
+    "bloom_level": "Analyze",
+    "marks": 6,
+    "exam_year": 2024
+  },
+  {
+    "question": "Assume a client sitting in a home network (network address 192.168.1.0/24) behind host 192.168.1.4 requests a web page on an AUST web server (port 80) with IP address 173.194.67.102. Describe the step-by-step NAT process for this scenario, including the NAT translation table for all the hosts in the home network.",
+    "topic": "Network Address Translation (NAT)",
+    "course_outcome": "CO4",
+    "bloom_level": "Apply",
+    "marks": 6,
+    "exam_year": 2024
+  },
+  {
+    "question": "Consider the given network. Suppose host A wants to send an IP datagram to host B. For transferring frames at the link level, the MAC address of the host is required to be known. Since host A and host B are in different LANs, host A cannot broadcast an ARP query to determine host B's MAC address. Describe the step-by-step process of how Address Resolution Protocol (ARP) would resolve this issue and construct ARP tables for the hosts A, B, and R in this network. You may choose any number for the TTL field.",
+    "topic": "Address Resolution Protocol (ARP)",
+    "course_outcome": "CO4",
+    "bloom_level": "Apply",
+    "marks": 6,
+    "exam_year": 2024
+  },
+  {
+    "question": "Consider the Finite State Machine (FSM) specification of a receiver using a reliable data transfer protocol (rdt) as shown. Examine the FSM to determine which rdt protocol is in use and explain how the receiver would determine whether the received packet is corrupted, and if the packet is corrupted then how would the receiver notify the sender. Also, list the improvements that have been made in later versions of the protocol.",
+    "topic": "Reliable Data Transfer Protocols (rdt)",
+    "course_outcome": "CO3",
+    "bloom_level": "Analyze",
+    "marks": 6,
+    "exam_year": 2024
+  }
+]

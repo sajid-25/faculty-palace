@@ -1,0 +1,14 @@
+[
+  {
+    "code": "CO1",
+    "description": "Explain the fundamental concepts and principles underlying computer networks, including their components, functionalities, and basic protocols"
+  },
+  {
+    "code": "CO2",
+    "description": "Solve different computer networks related problems by applying methodological and structural approaches"
+  },
+  {
+    "code": "CO3",
+    "description": "Analyze different networking principles and techniques for reliable communication"
+  }
+]

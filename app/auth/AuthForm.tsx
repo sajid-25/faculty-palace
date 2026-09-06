@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth, UserRole, DEMO_USERS, isValidEmail } from "../context/AuthContext";
 
 type AuthFormProps = {
@@ -276,8 +277,9 @@ export default function AuthForm({ mode }: AuthFormProps) {
                           type="button"
                           onClick={() => setShowPassword(!showPassword)}
                           aria-label={showPassword ? "Hide password" : "Show password"}
+                          className="password-visibility-button"
                         >
-                          {showPassword ? "Hide" : "Show"}
+                          {showPassword ? <EyeOff size={16} strokeWidth={1.8} /> : <Eye size={16} strokeWidth={1.8} />}
                         </button>
                       </span>
                     </label>
@@ -300,7 +302,7 @@ export default function AuthForm({ mode }: AuthFormProps) {
                         <span className="button-loading"><i className="loading-spinner" /> {isRegistering ? "Creating account..." : "Signing in..."}</span>
                       ) : (
                         <>
-                          <span>{isRegistering ? "Create Course Instructor Account" : "Sign in to Workspace"}</span>
+                          <span>{isRegistering ? "Create Course Instructor Account" : "Sign in"}</span>
                           <span>→</span>
                         </>
                       )}

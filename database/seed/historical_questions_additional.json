@@ -1,0 +1,149 @@
+[
+  {
+    "question": "Explain the role of each layer of the Internet Protocol Stack.",
+    "topic": "OSI / TCP-IP Layers",
+    "course_outcome": "CO1",
+    "bloom_level": "Understand",
+    "marks": 3
+  },
+  {
+    "question": "Explain the protocols used at the different phases of the email communication process across protocol layers.",
+    "topic": "Application Layer Protocols",
+    "course_outcome": "CO2",
+    "bloom_level": "Understand",
+    "marks": 3
+  },
+  {
+    "question": "Explain the working mechanism of Dynamic Adaptive Streaming over HTTP (DASH).",
+    "topic": "Application Layer Protocols",
+    "course_outcome": "CO2",
+    "bloom_level": "Understand",
+    "marks": 3
+  },
+  {
+    "question": "Explain the major types of switching fabrics used inside routers.",
+    "topic": "Network Layer - Router Architecture",
+    "course_outcome": "CO3",
+    "bloom_level": "Understand",
+    "marks": 3
+  },
+  {
+    "question": "Explain the necessity of tunneling in the Internet Protocol with an appropriate example.",
+    "topic": "Network Layer - IP",
+    "course_outcome": "CO3",
+    "bloom_level": "Understand",
+    "marks": 3
+  },
+  {
+    "question": "Explain the concept of middle boxes in network infrastructures with appropriate examples.",
+    "topic": "Network Infrastructure",
+    "course_outcome": "CO1",
+    "bloom_level": "Understand",
+    "marks": 3
+  },
+  {
+    "question": "Explain the necessity of Address Resolution Protocol (ARP).",
+    "topic": "Network Layer - Addressing",
+    "course_outcome": "CO3",
+    "bloom_level": "Understand",
+    "marks": 3
+  },
+  {
+    "question": "A router receives a packet of size 1500 bytes from an incoming link with a transmission rate of 10 Mbps. The packet must be transmitted on an outgoing link with a transmission rate of 100 Mbps. The distance from the source to the router is 5 km, and the propagation speed along the link is 2x10^8 m/s. The processing delay at the router is 1 millisecond, and the queuing delay is negligible. Calculate the transmission delay on the incoming link, transmission delay on the outgoing link, propagation delay from source to router, total delay experienced by the packet from source to router output, and the throughput experienced by the packet.",
+    "topic": "Delay and Throughput",
+    "course_outcome": "CO3",
+    "bloom_level": "Apply",
+    "marks": 5
+  },
+  {
+    "question": "A client requests a web page from a server using HTTP. The web page consists of one base HTML file of size 30 KB and 4 embedded objects, each of size 120 KB. The round-trip time (RTT) between the client and the server is 90 ms, and the transmission rate is 12 Mbps. Assume that the client must receive the HTML file before requesting the embedded objects, and ignore processing and queuing delays. Calculate the total time required (in seconds) to download the entire web page using non-persistent HTTP.",
+    "topic": "Application Layer - Web/HTTP",
+    "course_outcome": "CO2",
+    "bloom_level": "Apply",
+    "marks": 5
+  },
+  {
+    "question": "A datagram of size 8200 bytes (including a 24 byte header) is transmitted over a link with a Maximum Transmission Unit (MTU) of 2000 bytes, and the datagram has an identification number of 205. Determine how many fragments will be generated and construct a table for all fragments showing the fragment number, total length, payload size, identification number, MF (More Fragments) flag, and fragment offset.",
+    "topic": "Network Layer - IP Fragmentation",
+    "course_outcome": "CO3",
+    "bloom_level": "Apply",
+    "marks": 5
+  },
+  {
+    "question": "A sender wants to transmit data using the Internet checksum algorithm. The data is divided into four 16-bit words: 1100101011110000, 1010101010101010, 1111000000001111, and 0000111111110000. Compute the checksum value that will be transmitted. Show all intermediate steps.",
+    "topic": "Transport Layer - Error Detection",
+    "course_outcome": "CO4",
+    "bloom_level": "Apply",
+    "marks": 5
+  },
+  {
+    "question": "A TCP connection observes the following SampleRTT values for successive segments: 85 ms, 103 ms, and 97 ms. Using alpha = 0.35 and beta = 0.25, compute the values of EstimatedRTT, DevRTT, and TCP TimeoutInterval after processing all three samples. Assume that the initial EstimatedRTT is 80 ms and the initial DevRTT is 4 ms.",
+    "topic": "Transport Layer - TCP",
+    "course_outcome": "CO4",
+    "bloom_level": "Apply",
+    "marks": 5
+  },
+  {
+    "question": "Using the RSA public key cryptosystem, let the letter-to-number mapping be defined as A=2, B=3, ..., Z=1. Suppose the prime numbers are p=5 and q=11. Determine n and z, select an appropriate public exponent e, and compute the corresponding private exponent d. Then, encode the word \"REVIVER\" encrypting each letter separately. Finally, apply the decryption algorithm to the encrypted message to recover the original plaintext.",
+    "topic": "Network Security - RSA",
+    "course_outcome": "CO5",
+    "bloom_level": "Apply",
+    "marks": 5
+  },
+  {
+    "question": "A sender wants to transmit a data bit sequence 1011010110 using the CRC error detection technique with a generator polynomial 11001. The sender computes the CRC remainder and appends it to the data before transmission. At the receiver, the received bit sequence is 10110101100110. Determine the CRC remainder generated by the sender and verify whether the received data contains any error by performing the CRC check at the receiver. Show all intermediate steps.",
+    "topic": "Data Link Layer - Error Detection",
+    "course_outcome": "CO4",
+    "bloom_level": "Apply",
+    "marks": 5
+  },
+  {
+    "question": "A sender uses a sliding window protocol with window size 3 and 2-bit sequence numbers to transmit frames. The sender transmits frames 0, 1, 2, 3 and then continues with frame 0 again. Assume that the first transmission of frame 0 is lost, while all other frames and acknowledgments are received correctly. Draw the sequence diagram for both Go-Back-N (GBN) and Selective Repeat (SR) protocols. Based on your diagram, identify which frames are retransmitted and describe how the receiver processes the frames. Finally, determine whether ambiguity occurs in Selective Repeat in this scenario and justify your answer.",
+    "topic": "Transport Layer - Reliable Data Transfer",
+    "course_outcome": "CO4",
+    "bloom_level": "Analyze",
+    "marks": 6
+  },
+  {
+    "question": "An ISP is granted a block of addresses starting with 190.100.0.0/16. The ISP needs to distribute these addresses to three groups of customers: the first group has 60 customers, each needing 200 addresses; the second group has 120 customers, each needing 100 addresses; the third group has 130 customers, each needing 50 addresses. Design appropriate sub-blocks for each group and provide the corresponding slash notation. For each allocated sub-block, clearly specify the network address, broadcast address, and subnet mask. Then, analyze the efficiency of the allocation by calculating the total number of unused addresses and explaining whether the address space is used efficiently or not.",
+    "topic": "Network Layer - IP Addressing / Subnetting (VLSM)",
+    "course_outcome": "CO3",
+    "bloom_level": "Apply",
+    "marks": 6
+  },
+  {
+    "question": "In a shared communication medium, multiple nodes attempt to transmit data frames using random access protocols, which may lead to collisions and reduced channel utilization. Two such protocols, Pure ALOHA and Slotted ALOHA, differ in how transmissions are synchronized over time. Considering their operational characteristics, compare the performance of these two protocols by deriving the maximum efficiency of each.",
+    "topic": "Data Link Layer - Multiple Access Protocols",
+    "course_outcome": "CO4",
+    "bloom_level": "Analyze",
+    "marks": 6
+  },
+  {
+    "question": "Consider a network where each node initially knows only the link costs to its immediate neighbors. Nodes exchange routing information only with their neighbors at each step. Identify the appropriate routing algorithm for this scenario and simulate its operation by constructing the distance vectors for all nodes after each round of information exchange until the network reaches a stable state. Based on the final results, determine the least-cost paths between all pairs of nodes and derive the corresponding forwarding tables, clearly indicating the next-hop node and the total path cost to each destination.",
+    "topic": "Network Layer - Routing Algorithms (Distance Vector)",
+    "course_outcome": "CO3",
+    "bloom_level": "Apply",
+    "marks": 6
+  },
+  {
+    "question": "TCP uses congestion control to regulate the traffic entering the network. The behavior of TCP congestion control can be represented by a graph where the x-axis indicates the transmission round (RTT) and the y-axis indicates the congestion window size (cwnd). Given the congestion window graph, identify the intervals during which TCP slow start is operating, the intervals during which TCP congestion avoidance is operating, the transmission rounds at which segment loss is detected by triple duplicate ACKs, the transmission rounds at which segment loss is detected by a timeout, the value of ssthresh at the 15th transmission round, and during which transmission round the 36th segment is sent.",
+    "topic": "Transport Layer - Congestion Control",
+    "course_outcome": "CO4",
+    "bloom_level": "Analyze",
+    "marks": 6
+  },
+  {
+    "question": "Consider the Finite State Machine (FSM) of a reliable data transfer (rdt) protocol. Examine the FSM to identify which version of the rdt protocol is represented. Based on your examination, explain how the protocol detects whether a received packet is corrupted and how it responds in case of corruption. Finally, discuss the key improvements introduced in later versions of the rdt protocol.",
+    "topic": "Transport Layer - Reliable Data Transfer",
+    "course_outcome": "CO4",
+    "bloom_level": "Analyze",
+    "marks": 6
+  },
+  {
+    "question": "An institutional network is connected to the Internet through an access link of rate 2 Mbps. The round-trip time between the institutional router and the origin servers is 2.5 seconds. The average size of a web object is 120 Kbits, and the average request rate from users is 12 requests per second. Initially, all requests are served directly from the origin servers, resulting in noticeable delay. To improve performance, a local web cache is introduced. The cache satisfies 50% of the requests locally with negligible delay, while the remaining requests are served from the origin servers. Compare the system performance before and after introducing the web cache by calculating the access link utilization and the average end-to-end delay in both cases, and determine whether caching significantly improves network performance.",
+    "topic": "Application Layer - Web Caching / Delay",
+    "course_outcome": "CO2",
+    "bloom_level": "Evaluate",
+    "marks": 6
+  }
+]
