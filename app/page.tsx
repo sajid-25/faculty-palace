@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, useState } from "react";
+import Link from "next/link";
 
 const questions = [
   { number: "01", prompt: "Explain the role of normalization in relational databases.", topic: "Database Design", co: "CO2", bloom: "Understand", marks: "05" },
@@ -43,7 +44,7 @@ export default function Home() {
       </aside>
 
       <section className="content-area">
-        <header className="topbar"><div className="breadcrumb"><span>Workspace</span><b>/</b><strong>{activeNav}</strong></div><div className="top-actions"><button className="icon-button" aria-label="Notifications">♧<i /></button><button className="outline-button">View question bank <span>↗</span></button></div></header>
+        <header className="topbar"><div className="breadcrumb"><span>Workspace</span><b>/</b><strong>{activeNav}</strong></div><div className="top-actions"><button className="icon-button" aria-label="Notifications">♧<i /></button><Link className="auth-link auth-link-muted" href="/login">Sign in</Link><Link className="auth-link auth-link-primary" href="/register">Create account <span>→</span></Link><button className="outline-button">View question bank <span>↗</span></button></div></header>
         <div className="content-wrap">
           <section className="intro"><div><p className="eyebrow">MONDAY, SEPTEMBER 07, 2026</p><h1>Good morning, Arjun<span>.</span></h1><p className="intro-copy">Turn your draft assessments into clear, confident decisions.</p></div><div className="intro-status"><span className="status-dot" /> System ready <span className="status-divider" /> Last synced 2 min ago</div></section>
 
