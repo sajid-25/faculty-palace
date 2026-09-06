@@ -1,4 +1,9 @@
 import { PDFParse } from "pdf-parse";
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+
+const pdfWorkerPath = path.join(process.cwd(), "node_modules", "pdfjs-dist", "legacy", "build", "pdf.worker.mjs");
+PDFParse.setWorker(pathToFileURL(pdfWorkerPath).toString());
 
 export interface ExtractedDocument {
   filename: string;

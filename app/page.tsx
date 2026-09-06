@@ -1,11 +1,12 @@
 "use client";
 
-import { ChangeEvent, useState, useMemo } from "react";
+import { ChangeEvent, useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useAuth, DEMO_USERS } from "./context/AuthContext";
 
 type Question = {
+  id?: string;
   number: string;
   prompt: string;
   topic: string;
@@ -89,8 +90,8 @@ type ReportItem = {
 const initialReports: ReportItem[] = [
   {
     id: "rep-1",
-    title: "DBMS Final Exam Draft 2026",
-    course: "CSE 3105 · Database Systems",
+    title: "Computer Networks Final Exam Draft 2026",
+    course: "CSE-NETWORKS · Computer Networks",
     date: "Sep 07, 2026",
     qualityScore: 82,
     questionsCount: 24,
@@ -153,7 +154,7 @@ function LandingPage() {
         </div>
         <div className="landing-hero-visual" aria-label="Assessment quality overview preview">
           <div className="visual-orbit orbit-one" /><div className="visual-orbit orbit-two" />
-          <div className="visual-report-card"><div className="visual-card-top"><span className="visual-card-kicker">LATEST AUDIT</span><span className="visual-status">● READY</span></div><h2>DBMS Final Exam</h2><p>Assessment quality report</p><div className="visual-score-row"><div className="visual-score"><strong>82</strong><span>/100</span></div><div className="visual-score-copy"><b>Strong foundation</b><small>↑ 8% from last assessment</small></div></div><div className="visual-bars"><i /><i /><i /><i /><i /></div><div className="visual-tags"><span>8 topics covered</span><span>24 questions</span></div></div>
+          <div className="visual-report-card"><div className="visual-card-top"><span className="visual-card-kicker">LATEST AUDIT</span><span className="visual-status">● READY</span></div><h2>Computer Networks Exam</h2><p>Assessment quality report</p><div className="visual-score-row"><div className="visual-score"><strong>82</strong><span>/100</span></div><div className="visual-score-copy"><b>Strong foundation</b><small>↑ 8% from last assessment</small></div></div><div className="visual-bars"><i /><i /><i /><i /><i /></div><div className="visual-tags"><span>Topics covered</span><span>Questions analyzed</span></div></div>
           <div className="visual-float visual-float-top"><span>✓</span><div><b>CO alignment</b><small>92% confidence</small></div></div><div className="visual-float visual-float-bottom"><span>!</span><div><b>2 coverage gaps</b><small>Worth a closer look</small></div></div>
         </div>
       </section>
@@ -180,11 +181,14 @@ export default function Home() {
   // Overview states
   const [syllabus, setSyllabus] = useState<string | null>(null);
   const [exam, setExam] = useState<string | null>(null);
+  const [syllabusFile, setSyllabusFile] = useState<File | null>(null);
+  const [examFile, setExamFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisComplete, setAnalysisComplete] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
 
   // New Analysis Wizard state
-  const [wizardCourse, setWizardCourse] = useState("CSE 3105 - Database Management Systems");
+  const [wizardCourse, setWizardCourse] = useState("CSE-NETWORKS - Computer Networks");
   const [wizardExamType, setWizardExamType] = useState("Final Exam Draft");
   const [wizardSyllabus, setWizardSyllabus] = useState<string | null>(null);
   const [wizardExam, setWizardExam] = useState<string | null>(null);
@@ -198,6 +202,7 @@ export default function Home() {
   const [selectedCO, setSelectedCO] = useState("ALL");
   const [onlyFlagged, setOnlyFlagged] = useState(false);
   const [questions, setQuestions] = useState<Question[]>(initialQuestions);
+  const [isLoadingQuestions, setIsLoadingQuestions] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newQuestionPrompt, setNewQuestionPrompt] = useState("");
   const [newQuestionTopic, setNewQuestionTopic] = useState("Database Design");
@@ -205,21 +210,94 @@ export default function Home() {
   const [newQuestionBloom, setNewQuestionBloom] = useState<Question["bloom"]>("Apply");
   const [newQuestionMarks, setNewQuestionMarks] = useState("05");
 
+  useEffect(() => {
+    if (!isLoggedIn) return;
+    const loadQuestions = window.setTimeout(() => {
+      setIsLoadingQuestions(true);
+      fetch("/api/questions")
+        .then(async (response) => {
+          const payload = await response.json();
+          if (!response.ok) throw new Error(payload.error || "Unable to load question bank.");
+          setQuestions(payload.data as Question[]);
+        })
+        .catch((error) => setAnalysisError(error instanceof Error ? error.message : "Unable to load question bank."))
+        .finally(() => setIsLoadingQuestions(false));
+    }, 0);
+    return () => window.clearTimeout(loadQuestions);
+  }, [isLoggedIn]);
+
   const handleFile = (event: ChangeEvent<HTMLInputElement>, type: "syllabus" | "exam") => {
     const file = event.target.files?.[0];
     if (!file) return;
-    if (type === "syllabus") setSyllabus(file.name);
-    else setExam(file.name);
+    if (type === "syllabus") {
+      setSyllabus(file.name);
+      setSyllabusFile(file);
+    } else {
+      setExam(file.name);
+      setExamFile(file);
+    }
   };
 
-  const runAnalysis = () => {
-    if (!syllabus || !exam) return;
+  const runAnalysis = async () => {
+    if (!syllabusFile || !examFile) return;
     setIsAnalyzing(true);
     setAnalysisComplete(false);
-    window.setTimeout(() => {
-      setIsAnalyzing(false);
+    setAnalysisError(null);
+
+    try {
+      const syllabusForm = new FormData();
+      syllabusForm.append("file", syllabusFile);
+      syllabusForm.append("courseCode", "CSE-NETWORKS");
+      syllabusForm.append("courseName", "Computer Networks");
+      const syllabusResponse = await fetch("/api/upload/syllabus", { method: "POST", body: syllabusForm });
+      if (!syllabusResponse.ok) throw new Error((await syllabusResponse.json()).error || "Syllabus upload failed.");
+
+      const examForm = new FormData();
+      examForm.append("file", examFile);
+      examForm.append("courseCode", "CSE-NETWORKS");
+      examForm.append("examTitle", examFile.name);
+      const examResponse = await fetch("/api/upload/exam", { method: "POST", body: examForm });
+      const examData = await examResponse.json();
+      if (!examResponse.ok) throw new Error(examData.error || "Exam upload failed.");
+
+      const analysisResponse = await fetch("/api/analysis/start", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ examPaperId: examData.data.id }),
+      });
+      const analysisData = await analysisResponse.json();
+      if (!analysisResponse.ok) throw new Error(analysisData.error || "Analysis failed.");
+      const report = analysisData.data.report;
+      const analysisByNumber = new Map<number, { topic: string; course_outcome: string; bloom_level: Question["bloom"] }>((analysisData.data.analyses || []).map((item: { question_id_number: number; topic: string; course_outcome: string; bloom_level: Question["bloom"] }) => [item.question_id_number, item]));
+      const similarityByQuestion = new Map<string, { previousCount: number }>((analysisData.data.similarities || []).map((item: { questionId: string; previousCount: number }) => [item.questionId, item]));
+      setQuestions(analysisData.data.questions.map((question: { id: string; question_number: number; question_text: string; marks: number }, index: number) => {
+        const analysis = analysisByNumber.get(question.question_number);
+        const similarity = similarityByQuestion.get(question.id);
+        return {
+          number: String(question.question_number || index + 1).padStart(2, "0"),
+          prompt: question.question_text,
+          topic: analysis?.topic || "Unmapped",
+          co: analysis?.course_outcome || "Unmapped",
+          bloom: analysis?.bloom_level || "Understand",
+          marks: String(question.marks).padStart(2, "0"),
+          similarity: similarity?.previousCount ? { score: 75, matchExam: `${similarity.previousCount} prior match(es)`, matchQuestion: "Historical question similarity detected" } : undefined,
+        };
+      }));
+      setReports((previous) => previous.map((item) => item.id === "rep-1" ? {
+        ...item,
+        qualityScore: report.quality_score,
+        questionsCount: analysisData.data.questionCount,
+        coverageGaps: report.missing_topics.length,
+        similarities: report.similarity_flags.length,
+        status: "Action Needed",
+        recommendation: report.recommendations.join(" "),
+      } : item));
       setAnalysisComplete(true);
-    }, 1200);
+    } catch (error) {
+      setAnalysisError(error instanceof Error ? error.message : "Unable to analyze this assessment.");
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
   const runWizardAnalysis = () => {
@@ -666,13 +744,14 @@ export default function Home() {
                         <button onClick={() => setActiveNav("Reports")}>View full report →</button>
                       </div>
                     )}
+                    {analysisError && <div className="analysis-error-toast" role="alert">⚠ {analysisError}</div>}
                   </section>
 
                   {/* Insights / Snapshot */}
                   <section className="insights-section">
                     <div className="section-heading report-heading">
                       <div>
-                        <p className="eyebrow">LATEST AUDIT · DBMS FINAL EXAM</p>
+                        <p className="eyebrow">LATEST AUDIT · COMPUTER NETWORKS FINAL EXAM</p>
                         <h2>Assessment quality snapshot</h2>
                       </div>
                       <button className="text-button" onClick={() => setActiveNav("Reports")}>
@@ -851,7 +930,7 @@ export default function Home() {
                               onChange={(e) => setWizardCourse(e.target.value)}
                               className="input-control"
                             >
-                              <option>CSE 3105 - Database Management Systems</option>
+                              <option>CSE-NETWORKS - Computer Networks</option>
                               <option>CSE 2101 - Data Structures & Algorithms</option>
                               <option>CSE 3201 - Algorithm Design</option>
                               <option>CSE 4107 - Artificial Intelligence</option>
@@ -903,13 +982,13 @@ export default function Home() {
 
                           <div className="wizard-quick-fill">
                             <strong>Demo Quick Fill</strong>
-                            <p>Load sample DBMS syllabus and draft exam in one click:</p>
+                            <p>Load sample Computer Networks syllabus and draft exam in one click:</p>
                             <button
                               type="button"
                               className="outline-button"
                               onClick={() => {
-                                setWizardSyllabus("CSE_3105_DBMS_Syllabus.pdf");
-                                setWizardExam("DBMS_Final_Exam_Draft_2026.pdf");
+                                setWizardSyllabus("CSE_NETWORKS_Syllabus.pdf");
+                                setWizardExam("Computer_Networks_Final_Exam_Draft_2026.pdf");
                               }}
                             >
                               ⚡ Load Sample Files
@@ -998,6 +1077,7 @@ export default function Home() {
                     <div>
                       <p className="eyebrow">INSTITUTIONAL REPOSITORY</p>
                       <h2>Question Bank & Similarity Archive</h2>
+                      {isLoadingQuestions && <small className="data-loading-label">Loading questions from Supabase...</small>}
                     </div>
                     <div className="bank-top-actions">
                       {can("editBank") ? (
@@ -1163,7 +1243,7 @@ export default function Home() {
                   {/* Questions Grid */}
                   <div className="bank-grid">
                     {filteredQuestions.map((q) => (
-                      <div key={q.number} className="bank-item-card">
+                      <div key={q.id || q.number} className="bank-item-card">
                         <div className="bank-item-top">
                           <span className="item-number">#{q.number}</span>
                           <span className="co-pill">{q.co}</span>

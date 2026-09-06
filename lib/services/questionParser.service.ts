@@ -1,94 +1,43 @@
 import { callGroq } from "@/lib/ai/aiService";
-import {
-  buildQuestionParserSystemPrompt,
-  buildQuestionParserUserPrompt,
-} from "@/lib/ai/promptTemplates/questionParser.prompt";
 
-export interface ParsedQuestion {
-  id?: string;
-  question_number: number | string;
+export type ParsedQuestion = {
+  question_number: number;
   question_text: string;
   marks: number;
-}
+};
 
-export interface ParseExamResult {
-  totalExamMarks: number;
-  questionCount: number;
-  questions: ParsedQuestion[];
-  telemetry: {
-    model: string;
-    latencyMs: number;
-    totalTokens: number;
-  };
-}
-
-interface RawParserResponse {
-  totalExamMarks?: number;
-  questionCount?: number;
+type ParserResponse = {
   questions?: Array<{
     question_number?: number | string;
     question?: string;
     question_text?: string;
     marks?: number | string;
   }>;
-}
+};
 
-/**
- * Parses raw exam text into a structured list of questions with marks.
- */
-export async function parseExamQuestions(rawExamText: string): Promise<ParseExamResult> {
-  const trimmed = (rawExamText || "").trim();
+export async function parseExamQuestions(rawExamText: string) {
+  if (!rawExamText.trim()) throw new Error("The uploaded exam contains no readable text.");
 
-  if (!trimmed || trimmed.length < 15) {
-    throw new Error(
-      "Exam document is empty or contains insufficient text to parse questions. Please ensure the document contains readable examination content."
-    );
-  }
+  const result = await callGroq<ParserResponse>(
+    `Extract every numbered question from this exam text. Return only JSON with this shape: {"questions":[{"question_number":1,"question_text":"...","marks":5}]}. Preserve subparts inside the parent question. If marks are not shown, use 0.\n\nEXAM TEXT:\n${rawExamText}`,
+    {
+      temperature: 0,
+      systemPrompt: "You are an exam question parser. Return strict JSON only. Do not invent questions or marks.",
+    },
+  );
 
-  const systemPrompt = buildQuestionParserSystemPrompt();
-  const userPrompt = buildQuestionParserUserPrompt({ rawExamText: trimmed });
+  const questions = (result.data.questions || []).map((question, index) => ({
+    question_number: Number(question.question_number) || index + 1,
+    question_text: String(question.question_text || question.question || "").trim(),
+    marks: Math.max(0, Number(question.marks) || 0),
+  })).filter((question) => question.question_text.length > 0);
 
-  const aiResult = await callGroq<RawParserResponse>(userPrompt, {
-    systemPrompt,
-    temperature: 0.1,
-  });
-
-  const parsedData = aiResult.data;
-  const rawQuestions = parsedData?.questions || [];
-
-  if (!Array.isArray(rawQuestions) || rawQuestions.length === 0) {
-    throw new Error(
-      "The AI model could not identify any examination questions in the provided text. The document may be garbled, unformatted, or missing actual questions."
-    );
-  }
-
-  const cleanedQuestions: ParsedQuestion[] = rawQuestions.map((q, idx) => {
-    const text = (q.question_text || q.question || "").trim();
-    const rawMarks = q.marks !== undefined ? Number(q.marks) : 0;
-    const marks = Number.isFinite(rawMarks) && rawMarks >= 0 ? rawMarks : 0;
-    const qNum = q.question_number !== undefined ? q.question_number : idx + 1;
-
-    return {
-      question_number: qNum,
-      question_text: text || `Question ${qNum}`,
-      marks,
-    };
-  });
-
-  const calculatedTotalMarks = cleanedQuestions.reduce((sum, q) => sum + q.marks, 0);
-  const totalExamMarks =
-    typeof parsedData.totalExamMarks === "number" && parsedData.totalExamMarks > 0
-      ? parsedData.totalExamMarks
-      : calculatedTotalMarks;
+  if (!questions.length) throw new Error("No questions could be identified in the uploaded exam.");
 
   return {
-    totalExamMarks,
-    questionCount: cleanedQuestions.length,
-    questions: cleanedQuestions,
-    telemetry: {
-      model: aiResult.telemetry.model,
-      latencyMs: aiResult.telemetry.latencyMs,
-      totalTokens: aiResult.telemetry.totalTokens,
-    },
+    questions,
+    questionCount: questions.length,
+    totalMarks: questions.reduce((total, question) => total + question.marks, 0),
+    telemetry: result.telemetry,
   };
 }
